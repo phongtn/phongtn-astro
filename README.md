@@ -1,29 +1,21 @@
-<div align="center">
-  <img alt="Astro Citrus logo" src="https://github.com/ArtemKutsan/astro-citrus/blob/main/src/assets/images/logo.svg" width="70" />
-</div>
-<h1 align="center">
-  Astro Citrus
-</h1>
 
-Astro Citrus is a simple opinionated starter built with the Astro framework. Use it to create an easy-to-use blog or website.
+
+This is my personal blog. I found Astro.build, and this framework has inspired me to build websites again.  
+This blog build on the theme [Astro Theme Cactus](https://github.com/chrismwilliams/astro-theme-cactus) by [Chriss Williams](https://github.com/chrismwilliams). Huge thanks to Chriss for his amazing work and inspiration!** 🚀👏
 
 ## Table Of Contents
 
 1. [Key Features](#key-features)
-2. [Demo](#demo)
-3. [Quick start](#quick-start)
-4. [Preview](#preview)
-5. [Commands](#commands)
-6. [Configure](#configure)
-7. [Updating](#updating)
-8. [Adding posts and notes](#adding-posts-and-notes)
+3. [Commands](#commands)
+4. [Configure](#configure)
+6. [Adding posts and notes](#adding-posts-and-notes)
    - [Post Frontmatter](#post-frontmatter)
    - [Note Frontmatter](#note-frontmatter)
    - [Frontmatter Snippet](#frontmatter-snippet)
-9. [Pagefind search](#pagefind-search)
-10. [Analytics](#analytics)
-11. [Deploy](#deploy)
-12. [Acknowledgment](#acknowledgment)
+7. [Pagefind search](#pagefind-search)
+8. [Analytics](#analytics)
+9. [Deploy](#deploy)
+10. [Acknowledgment](#acknowledgment)
 
 ## Key Features
 
@@ -43,33 +35,7 @@ Astro Citrus is a simple opinionated starter built with the Astro framework. Use
   - [web app manifest](https://github.com/alextim/astro-lib/blob/main/packages/astro-webmanifest/README.md)
 - [Pagefind](https://pagefind.app/) static search library integration
 - [Astro Icon](https://github.com/natemoo-re/astro-icon) svg icon component
-- [Rehype Pretty Code](https://rehype-pretty.pages.dev/) code blocks and syntax highlighter
-
-## Demo
-
-Check out the [Demo](https://astrocitrus.netlify.app/)
-
-## Quick start
-
-[Create a new repo](https://github.com/artemkutsan/astro-citrus/generate) from this template.
-
-```bash
-# npm 7+
-npm create astro@latest -- --template artemkutsan/astro-citrus
-
-# pnpm
-pnpm dlx create-astro --template artemkutsan/astro-citrus
-```
-
-[![Deploy with Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/artemkutsan/astro-citrus) [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fartemkutsan%2Fastro-citrus&project-name=astro-citrus)
-
-## Preview
-
-| ![Light Theme 01](https://github.com/ArtemKutsan/astro-citrus/blob/main/public/images/screenshot01.png?raw=true) | ![Light Theme 02](https://github.com/ArtemKutsan/astro-citrus/blob/main/public/images/screenshot02.png?raw=true) |
-|-------------|-------------|
-| ![Dark Theme 03](https://github.com/ArtemKutsan/astro-citrus/blob/main/public/images/screenshot03.png?raw=true) | ![Light Theme 04](https://github.com/ArtemKutsan/astro-citrus/blob/main/public/images/screenshot04.png?raw=true) |
-| ![Light Theme 05](https://github.com/ArtemKutsan/astro-citrus/blob/main/public/images/screenshot05.png?raw=true) | ![Light Theme 06](https://github.com/ArtemKutsan/astro-citrus/blob/main/public/images/screenshot06.png?raw=true) |
-| ![Dark Theme 07](https://github.com/ArtemKutsan/astro-citrus/blob/main/public/images/screenshot07.png?raw=true) | ![Dark Theme 08](https://github.com/ArtemKutsan/astro-citrus/blob/main/public/images/screenshot08.png?raw=true) |
+- [Rehype Pretty Code](https://rehype-pretty.pages.dev/) blocks and syntax highlighter
 
 ## Commands
 
@@ -103,12 +69,6 @@ Replace pnpm with your choice of npm / yarn
   - You can also create your own og images and skip satori generating it for you by adding an ogImage property in the frontmatter with a link to the asset, an example can be found in `src/content/post/social-image.md`. More info on frontmatter can be found [here](#frontmatter)
 - Optional:
   - Fonts: This theme sets the body element to the font family `font-mono`, located in the global css file `src/styles/global.css`. You can change fonts by removing the variant `font-mono`, after which TailwindCSS will default to the `font-sans` [font family stack](https://tailwindcss.com/docs/font-family).
-
-## Updating
-
-If you've forked the template, you can [sync the fork](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork) with your own project, remembering to **not** click Discard Changes as you will lose your own.
-
-If you have a template repository, you can add this template as a remote, as discussed [here](https://stackoverflow.com/questions/56577184/github-pull-changes-from-a-template-repository).
 
 ## Adding posts and notes
 
