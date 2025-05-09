@@ -1,8 +1,8 @@
 ---
-title: "How to Use Vectordb and Pgvector in a Hybrid Search System"
-description: "Learn how to combine SQL and vector databases like pgvector and ChromaDB for hybrid semantic search. Discover when to use vector similarity vs. SQL filtering, and how to build an LLM-driven query router for optimal search accuracy."
+title: "Sử dụng VectorDB để build hệ thống Hybrid Search"
+description: "Sử dụng tính tương tự Vector và  SQL để xây dựng lớp truy vấn Knowledge tối ưu cho LLM."
 publishDate: "2025-05-07"
-tags: ["agent", "vectordb", "tag"]
+tags: ["agent", "vectordb",]
 ---
 # VectorDB và Pgvector trong hệ thống Hybrid Search
 
