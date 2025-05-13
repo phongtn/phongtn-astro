@@ -1,6 +1,6 @@
 ---
 title: "Vấn đề import module khi dùng Streamlit"
-description: "Bài viết này sẽ giải thích cơ chế import của Python, vai trò của sys.path, và cách một đoạn code "thần kỳ" có thể giúp bạn giải quyết vấn đề này.."
+description: "Bài viết này sẽ giải thích cơ chế import của Python, vai trò của sys.path"
 publishDate: "2025-05-13"
 tags: ["python", "Streamlit",]
 ---
