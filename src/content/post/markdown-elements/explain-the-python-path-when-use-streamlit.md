@@ -49,19 +49,29 @@ Nếu bạn chạy `streamlit run ui/Home.py`:
 -   Trong `ui/Home.py`, nếu bạn viết `from ui.utils import ...`, Python sẽ tìm `ui/ui/utils.py` (sai!). Bạn cần viết `from utils import ...`.
 -   Trong `ui/pages/1_Sage.py`, nếu bạn viết `from agents.sage import ...`, Python sẽ tìm `ui/agents/sage.py` (sai!). Module `agents` nằm ở thư mục gốc.
 
-## Giải Pháp đơn giản là can Thiệp Vào `sys.path`
+## Giải Pháp đơn giản là can thiệp Vào `sys.path`
 
-Khi các cơ chế mặc định không đủ, chúng ta có thể "chỉ đường" cho Python bằng cách thêm đường dẫn thư mục gốc của dự án vào `sys.path` một cách tường minh. Đây là đoạn code thường được sử dụng, ví dụ trong file `/source-base/ui/pages/1_Sage.py`:
+Khi các cơ chế mặc định không đủ, chúng ta có thể "hướng dẫn" cho Python bằng cách thêm đường dẫn thư mục gốc của dự án vào `sys.path` một cách tường minh. Đây là đoạn code thường được sử dụng, ví dụ trong file `/source-base/ui/pages/1_Sage.py`:
+
+```python
+# --- Add project root to sys.path ---
+# Current file: /source-base/ui/pages/1_Sage.py
+# Project root: /source-base/
+_PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
+# --- End of sys.path modification ---
+```
 
 ### Giải thích:
 -   `__file__`: Biến đặc biệt chứa đường dẫn đến file Python hiện tại.
 -   `os.path.dirname(__file__)`: Lấy tên thư mục chứa file đó.
 -   `os.path.join(path, '..')`: Đi lên một cấp thư mục cha. Lặp lại '..' để đi lên nhiều cấp.
 -   `os.path.abspath(path)`: Trả về đường dẫn tuyệt đối của path.
--   `sys.path.insert(0, path_to_add)`: Thêm path_to_add vào đầu danh sách sys.path. Việc thêm vào đầu (index 0) đảm bảo rằng Python sẽ ưu tiên tìm kiếm module trong thư mục dự án của bạn trước khi tìm ở những nơi khác, giúp tránh xung đột tên tiềm ẩn.
+-   `sys.path.insert(0, path_to_add)`: Thêm path_to_add vào đầu danh sách `sys.path`. Việc thêm vào đầu (index 0) đảm bảo rằng Python sẽ ưu tiên tìm kiếm module trong thư mục dự án của bạn trước khi tìm ở những nơi khác, giúp tránh xung đột tên tiềm ẩn.
 
 ## Tại Sao Python Lại "Phức Tạp" Như Vậy?
-Sự "phức tạp" này thực ra là cái giá của sự linh hoạt.Python được thiết kế để:
+Sự "phức tạp" này thực ra là cái giá của sự linh hoạt. Python được thiết kế để:
 -   **Chạy từ bất kỳ đâu**: Script có thể được thực thi từ nhiều vị trí khác nhau.
 -   **Tổ chức code đa dạng**: Không có một cấu trúc dự án "chuẩn" duy nhất.
 -   **Tránh xung đột không gian tên**: `sys.path` cung cấp một cơ chế rõ ràng để kiểm soát nơi Python tìm kiếm, thay vì "đoán mò" và có thể import nhầm module.
@@ -70,7 +80,7 @@ Việc can thiệp vào `sys.path` như trên là một cách phổ biến để
 
 ## Khi Nào Nên Sử Dụng Thủ Thuật Này?
 
--   Khi bạn cần một giải pháp nhanh chóng và hiệu quả cho các dự án mà cấu trúc thư mục khiến các import mặc định gặp khó khăn.
+-   Khi bạn cần một giải pháp nhanh chóng và hiệu quả cho các dự án mà cấu trúc thư mục khiến các `import` mặc định gặp khó khăn.
 -   Khi làm việc với các công cụ như Streamlit, nơi thư mục gốc của ứng dụng có thể không phải là thư mục gốc thực sự của toàn bộ dự án code của bạn.
 -   Trong giai đoạn phát triển để đảm bảo tính nhất quán của các import.
 
@@ -79,6 +89,8 @@ Việc can thiệp vào `sys.path` như trên là một cách phổ biến để
 -   Sử dụng biến môi trường `PYTHONPATH`.
 -   Chạy module của bạn bằng `python -m my_package.my_module`
 
-Hiểu rõ cách Python sử dụng `sys.path` để tìm kiếm module là chìa khóa để gỡ rối các lỗi `ModuleNotFoundError`. Bằng cách thêm thư mục gốc của dự án vào `sys.path` một cách có chủ đích, bạn có thể đảm bảo rằng các lệnh import của mình hoạt động nhất quán, bất kể script được chạy từ đâu hay bởi công cụ nào. Chúc bạn coding vui vẻ và ít gặp lỗi import hơn!
+Hiểu rõ cách Python sử dụng `sys.path` để tìm kiếm module là chìa khóa để gỡ rối các lỗi `ModuleNotFoundError`. 
+Bằng cách thêm thư mục gốc của dự án vào `sys.path` một cách có chủ đích, bạn có thể đảm bảo rằng các lệnh import của mình hoạt động nhất quán, bất kể script được chạy từ đâu hay bởi công cụ nào. 
+Happy Coding!
 
 
