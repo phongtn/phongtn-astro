@@ -387,3 +387,6 @@ Use Case: Email, blog ngắn, notes, Q&A form…
 - **MCP**: truy cập dữ liệu động theo thời gian thực (real-time execution).
 - Nhiều hệ thống dùng kết hợp cả RAG + MCP để tận dụng điểm mạnh của mỗi mô hình.
 
+---
+**References**:
+1. [Advanced RAG Techniques](https://medium.com/@yugank.aman/advanced-rag-techniques-0c283aacf5ba)
