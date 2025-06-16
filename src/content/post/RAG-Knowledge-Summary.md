@@ -6,6 +6,21 @@ tags: ["ai", "rag", "agent", "agentic"]
 ---
 
 # 📘 Tổng Hợp Kiến Thức về RAG (Retrieval-Augmented Generation)
+Mặc dù bài viết dưới đây tập trung vào các kỹ thuật RAG. Tuy nhiên mình vẫn muốn khái quát lại về bản chất của RAG.  
+### RAG thực sự là gì? 
+
+Các mô hình ngôn ngữ lớn (LLM) thường thiếu thông tin cập nhật hoặc dữ liệu chuyên biệt. Có hai lý do chính:
+
+- **Giới hạn thời gian của dữ liệu huấn luyện**: Các mô hình này được huấn luyện trên dữ liệu chỉ đến một thời điểm nhất định, dẫn đến việc kiến thức của chúng bị giới hạn. Các công cụ tìm kiếm AI như Perplexity hay Yaddle.ai sử dụng kết quả tìm kiếm theo thời gian thực để bổ sung thông tin mới nhất cho LLM.
+- **Nhu cầu về dữ liệu độc quyền**: Nhiều ứng dụng, đặc biệt trong doanh nghiệp, yêu cầu sử dụng dữ liệu nội bộ hoặc độc quyền. Ví dụ, tại Dropbox, chúng tôi đang phát triển Dash để tích hợp dữ liệu của công ty vào bối cảnh của LLM.
+### Vậy RAG là gì?
+
+RAG (Retrieval-Augmented Generation) là phương pháp giúp mô hình ngôn ngữ sử dụng thông tin từ nguồn bên ngoài mà nó không được huấn luyện trước đó. Khi bạn lấy nội dung từ một nguồn bên ngoài và đưa vào lời nhắc (prompt), đó chính là RAG.
+
+Về bản chất, RAG có nghĩa là giúp một mô hình ngôn ngữ có bối cảnh mà nó không được đào tạo. Khi bạn truy xuất nội dung từ một nguồn bên ngoài và đưa vào lời nhắc, đó là RAG. **Nó không quy định cách bạn truy xuất dữ liệu**. Có thể thông qua tìm kiếm vectơ, tìm kiếm từ khóa, truy vấn đồ thị, truy xuất từ nguồn khác máy chủ MCP, tác nhân tìm kiếm hoặc kết hợp tất cả những điều đó.
+
+![RAG for LLM](/assets/images/llm_rag.png "LLM and RAG")
+---
 
 ## 1. Kiến trúc tổng quát của RAG
 
