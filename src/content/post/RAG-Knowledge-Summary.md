@@ -19,7 +19,7 @@ RAG (Retrieval-Augmented Generation) là phương pháp giúp mô hình ngôn ng
 
 Về bản chất, RAG có nghĩa là giúp một mô hình ngôn ngữ có bối cảnh mà nó không được đào tạo. Khi bạn truy xuất nội dung từ một nguồn bên ngoài và đưa vào lời nhắc, đó là RAG. **Nó không quy định cách bạn truy xuất dữ liệu**. Có thể thông qua tìm kiếm vectơ, tìm kiếm từ khóa, truy vấn đồ thị, truy xuất từ nguồn khác máy chủ MCP, tác nhân tìm kiếm hoặc kết hợp tất cả những điều đó.
 
-![RAG for LLM](/assets/images/llm_rag.png "LLM and RAG")
+![RAG for LLM](https://i.ibb.co/pHZ41J5/llm-rag.png)
 ---
 
 ## 1. Kiến trúc tổng quát của RAG
