@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trail Ultra Training Template</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#faf9f6;--bg2:#f2f0ec;--bg3:#e8e6e1;--tx:#1c1b18;--tx2:#5a5955;--tx3:#8c8b86;--border:rgba(0,0,0,0.09);--accent:#1a5c54;--accent-l:#e8f5f2;--accent-m:#3b9b8f;--warn:#7a4b14;--warn-l:#faf0e0;--danger:#7a3520;--danger-l:#faeae5;--info:#14456e;--info-l:#e6f0fa;--purple:#4a3578;--purple-l:#f0ecfa;--green:#2d5a25;--green-l:#eaf3e8;--serif:'Lora',Georgia,serif;--sans:'DM Sans',-apple-system,sans-serif;--mono:'DM Mono','SF Mono',monospace}
+@media(prefers-color-scheme:dark){:root{--bg:#141310;--bg2:#1e1d1a;--bg3:#2a2926;--tx:#e4e2dc;--tx2:#a8a7a2;--tx3:#6e6d69;--border:rgba(255,255,255,0.08);--accent:#7ed4c8;--accent-l:#1a3330;--accent-m:#5dcaa5;--warn:#e8b06a;--warn-l:#332a18;--danger:#e89878;--danger-l:#33201a;--info:#7ab8f0;--info-l:#162840;--purple:#b8a0e8;--purple-l:#28203f;--green:#8ecf7a;--green-l:#1e3119}}
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:var(--sans);background:var(--bg);color:var(--tx);line-height:1.7;font-size:14px}
+.page{max-width:820px;margin:0 auto;padding:3rem 1.5rem 4rem}
+.hero{text-align:center;margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--border)}
+.hero-label{font-family:var(--mono);font-size:11px;font-weight:300;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.hero h1{font-family:var(--serif);font-size:34px;font-weight:400;letter-spacing:-.5px;line-height:1.2;margin-bottom:8px}
+.hero .sub{font-size:14px;color:var(--tx2);max-width:560px;margin:0 auto}
+.section{margin-bottom:3rem}.section-label{font-family:var(--mono);font-size:10px;font-weight:300;letter-spacing:2px;text-transform:uppercase;color:var(--tx3);margin-bottom:6px}
+.section h2{font-family:var(--serif);font-size:26px;font-weight:400;margin-bottom:14px;letter-spacing:-.3px}
+.section h3{font-size:15px;font-weight:500;margin:20px 0 8px}
+.section p,.section li{font-size:13px;color:var(--tx2);margin-bottom:8px}
+.divider{height:1px;background:var(--border);margin:2.5rem 0}
+.input-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0 20px}
+.input-group{background:var(--bg2);border-radius:10px;padding:14px 16px}
+.input-group label{display:block;font-size:11px;font-weight:500;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.input-group input,.input-group select{width:100%;background:var(--bg);border:.5px solid var(--border);border-radius:6px;padding:8px 12px;font-family:var(--mono);font-size:14px;color:var(--tx);outline:none}
+.input-group input:focus,.input-group select:focus{border-color:var(--accent-m)}
+.input-group .unit{font-size:11px;color:var(--tx3);margin-top:4px}
+.btn-primary{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:12px 32px;font-family:var(--sans);font-size:14px;font-weight:500;cursor:pointer;letter-spacing:.3px;transition:all .2s}
+.btn-primary:hover{opacity:.85}.btn-primary:active{transform:scale(.98)}
+.btn-primary:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.warning-box{background:var(--danger-l);border:.5px solid var(--danger);border-radius:10px;padding:14px 18px;margin:16px 0;font-size:13px;color:var(--danger);display:none}
+.results-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0}
+.result-card{background:var(--accent-l);border-radius:8px;padding:10px 12px;text-align:center}
+.result-card .val{font-family:var(--mono);font-size:18px;font-weight:400;color:var(--accent)}
+.result-card .lbl{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+.tl-container{margin:24px 0}
+.tl-bar{display:flex;border-radius:8px;overflow:hidden;height:44px;margin-bottom:6px}
+.tl-seg{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;letter-spacing:.3px;flex-direction:column;gap:1px;min-width:30px}
+.tl-seg .tl-weeks{font-family:var(--mono);font-size:9px;opacity:.8}
+.tl-dates-row{display:flex;margin-bottom:16px}.tl-dates-row .tl-date{font-family:var(--mono);font-size:9px;color:var(--tx3);text-align:center}
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:20px 0;align-items:start}
+.chart-box h4{font-size:12px;font-weight:500;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.donut-wrap{position:relative;width:200px;height:200px;margin:0 auto}
+.donut-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.donut-center .dc-val{font-family:var(--mono);font-size:20px;font-weight:400;color:var(--accent)}
+.donut-center .dc-lbl{font-size:10px;color:var(--tx3)}
+.donut-legend{display:flex;flex-direction:column;gap:4px;margin-top:12px}
+.donut-legend .dl-row{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tx2)}
+.donut-legend .dl-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.donut-legend .dl-pct{font-family:var(--mono);font-size:11px;color:var(--tx3);margin-left:auto}
+.vol-wrap{position:relative;height:200px}.vol-wrap canvas{width:100%;height:100%;cursor:crosshair}
+.vol-tooltip{position:absolute;pointer-events:none;background:var(--bg);border:.5px solid var(--border);border-radius:8px;padding:8px 12px;font-size:11px;display:none;z-index:10;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.vol-tooltip .vt-week{font-weight:500;color:var(--tx);margin-bottom:2px}.vol-tooltip .vt-row{color:var(--tx2);font-family:var(--mono);line-height:1.6}
+.vol-chart-label{font-size:10px;color:var(--tx3);text-align:center;font-family:var(--mono);margin-top:4px}
+/* BLOCK MULTIPLIER CONFIG */
+.block-config{margin-bottom:24px;border:0.5px solid var(--border);border-radius:12px;overflow:hidden}
+.bc-header{display:flex;align-items:center;gap:10px;padding:12px 16px;color:#fff;font-size:13px;font-weight:500}
+.bc-header .bc-phase{font-family:var(--mono);font-size:10px;opacity:.7;margin-left:auto}
+.bc-body{padding:0 16px 12px;background:var(--bg)}
+.bc-slider-row{display:grid;grid-template-columns:80px 1fr 60px 80px 80px;gap:8px;align-items:center;padding:6px 0;border-bottom:.5px solid var(--border);font-size:12px}
+.bc-slider-row:last-child{border-bottom:none}
+.bc-slider-row .bc-wk{font-family:var(--mono);font-size:11px;color:var(--tx2)}
+.bc-slider-row input[type=range]{width:100%;height:4px;-webkit-appearance:none;appearance:none;background:var(--bg3);border-radius:2px;outline:none}
+.bc-slider-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;cursor:pointer;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.bc-slider-row .bc-mult{font-family:var(--mono);font-size:12px;font-weight:500;text-align:center;min-width:50px}
+.bc-slider-row .bc-km{font-family:var(--mono);font-size:11px;color:var(--tx2);text-align:right}
+.bc-slider-row .bc-dp{font-family:var(--mono);font-size:11px;color:var(--tx3);text-align:right}
+.bc-slider-row.is-peak{background:var(--accent-l);margin:0 -16px;padding:6px 16px;border-radius:0}
+.bc-slider-row.is-peak .bc-wk{color:var(--accent);font-weight:500}
+.bc-slider-row.is-deload{opacity:.7}
+.bc-summary{display:flex;gap:16px;padding:10px 16px;background:var(--bg2);font-size:11px;color:var(--tx3);border-top:.5px solid var(--border)}
+.bc-summary span{font-family:var(--mono)}
+.bc-summary strong{color:var(--tx);font-weight:500}
+.changed-badge{display:inline-block;font-size:9px;background:var(--warn-l);color:var(--warn);padding:1px 6px;border-radius:8px;margin-left:8px;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+/* FORMULA, BLOCK, TABLE styles */
+.formula-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+.formula-card{background:var(--bg2);border-radius:10px;padding:16px;border-left:3px solid var(--accent-m)}
+.formula-card .f-name{font-size:12px;font-weight:500;color:var(--tx);margin-bottom:4px}
+.formula-card .f-formula{font-family:var(--mono);font-size:12px;color:var(--accent);margin-bottom:6px;background:var(--bg);padding:4px 8px;border-radius:4px;display:inline-block}
+.formula-card .f-desc{font-size:11px;color:var(--tx3);line-height:1.5}
+.block-header{background:var(--bg2);border-radius:12px;padding:20px 24px;margin-bottom:16px;position:relative;overflow:hidden}
+.block-header::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px}
+.bh-base::before{background:#5DCAA5}.bh-base2::before{background:#1D9E75}.bh-spec::before{background:#EF9F27}.bh-spec2::before{background:#BA7517}.bh-taper::before{background:#85B7EB}.bh-race::before{background:#ED93B1}
+.block-header .b-label{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px}
+.block-header h3{font-family:var(--serif);font-size:22px;font-weight:400;margin-bottom:6px}
+.block-header .b-dates{font-family:var(--mono);font-size:11px;color:var(--tx3);margin-bottom:10px}
+.block-header .b-focus{font-size:13px;color:var(--tx2);line-height:1.6}
+.block-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 16px}
+.bm{background:var(--bg);border:.5px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center}
+.bm .val{font-family:var(--mono);font-size:15px;font-weight:400}.bm .lbl{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.3px}
+.dist-bar-wrap{margin:12px 0}.dist-bar-label{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.dist-bar{display:flex;height:8px;border-radius:4px;overflow:hidden}.dist-bar .seg{height:100%}
+.dist-legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}.dist-legend span{font-size:10px;color:var(--tx3);display:flex;align-items:center;gap:4px}.dist-legend .dot{width:8px;height:8px;border-radius:2px}
+.week-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px}
+.week-table th{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--tx3);font-weight:500;text-align:center;padding:8px 4px;border-bottom:1px solid var(--border)}.week-table th:first-child{text-align:left}
+.week-table td{padding:7px 4px;text-align:center;border-bottom:.5px solid var(--border);font-family:var(--mono);font-size:11px;color:var(--tx2)}.week-table td:first-child{text-align:left;font-family:var(--sans);font-weight:500;font-size:12px;color:var(--tx)}
+.week-table tr:last-child td{border-bottom:none}
+.week-table tr.row-dl td{background:var(--bg2);font-style:italic}.week-table tr.row-pk td{background:var(--accent-l)}.week-table tr.row-sb td{background:var(--warn-l)}
+.tag{font-size:9px;font-weight:500;padding:2px 7px;border-radius:10px;display:inline-block;letter-spacing:.3px}
+.tag-dl{background:var(--bg3);color:var(--tx3)}.tag-pk{background:var(--accent-l);color:var(--accent)}.tag-sb{background:var(--warn-l);color:var(--warn)}.tag-new{background:var(--info-l);color:var(--info)}
+.coach-note{background:var(--bg2);border-radius:8px;padding:14px 18px;margin:14px 0;font-size:12px;color:var(--tx2);line-height:1.65;border-left:3px solid var(--accent-m)}.coach-note strong{color:var(--tx);font-weight:500}
+.checkpoint{background:var(--accent-l);border:.5px solid var(--accent-m);border-radius:10px;padding:16px 20px;margin:16px 0}
+.checkpoint .cp-title{font-size:12px;font-weight:500;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}.checkpoint p{font-size:12px;color:var(--tx2);margin-bottom:4px}
+.ref-card{background:var(--bg2);border-radius:10px;padding:16px 20px;margin-bottom:12px}
+.ref-card .ref-author{font-weight:500;font-size:13px;color:var(--tx);margin-bottom:2px}.ref-card .ref-book{font-style:italic;font-size:12px;color:var(--tx3);margin-bottom:8px}.ref-card .ref-principles{font-size:12px;color:var(--tx2);line-height:1.6}
+@media(max-width:600px){.input-grid,.formula-grid{grid-template-columns:1fr}.results-grid{grid-template-columns:repeat(2,1fr)}.charts-row{grid-template-columns:1fr}.bc-slider-row{grid-template-columns:60px 1fr 50px 60px 60px;gap:4px}.hero h1{font-size:26px}}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="hero">
+<div class="hero-label">Trail Ultra Training Template</div>
+<h1>Periodized Training Plan Generator</h1>
+<div class="sub">Giáo án trail ultra marathon dựa trên phương pháp luận của Koop, Johnston, Magness & Canova.</div>
+</div>
+
+<div class="section" id="sec-input">
+<div class="section-label">Phần 01</div>
+<h2>Thông số đầu vào</h2>
+<div class="input-grid">
+<div class="input-group"><label>Tên race</label><input type="text" id="in-name" value="VMM 100 Miles"></div>
+<div class="input-group"><label>Cự ly (km)</label><input type="number" id="in-dist" value="161" min="50" max="400"></div>
+<div class="input-group"><label>Tổng D+ race (m)</label><input type="number" id="in-race-dplus" value="8800" min="0" max="30000" step="100"></div>
+<div class="input-group"><label>Ngày bắt đầu tập</label><input type="date" id="in-start" value="2026-04-13"></div>
+<div class="input-group"><label>Ngày race</label><input type="date" id="in-race" value="2026-09-18"></div>
+<div class="input-group"><label>V — Volume baseline (km/tuần)</label><input type="number" id="in-v" value="70" min="20" max="200" step="5"><div class="unit">TB 4 tuần gần nhất</div></div>
+<div class="input-group"><label>Hill start gradient (%)</label><input type="number" id="in-hill" value="8" min="4" max="15"></div>
+<div class="input-group"><label>Cross-training</label><select id="in-cross"><option value="cycling">Cycling (preferred)</option><option value="swimming">Bơi</option><option value="easyrun">Easy run (V −7%)</option></select></div>
+</div>
+<button class="btn-primary" onclick="generate()">Generate Training Plan →</button>
+<div class="warning-box" id="warn-box"></div>
+</div>
+
+<div id="gen-content" style="display:none">
+<div class="divider"></div>
+<div class="section">
+<div class="section-label">Phần 02</div>
+<h2>Tổng quan kế hoạch</h2>
+<div class="results-grid" id="results-grid"></div>
+<div class="tl-container"><div class="tl-bar" id="tl-bar"></div><div class="tl-dates-row" id="tl-dates"></div></div>
+<div class="charts-row">
+<div class="chart-box"><h4>Tỷ lệ các giai đoạn</h4><div class="donut-wrap"><canvas id="donut-canvas" width="400" height="400"></canvas><div class="donut-center"><div class="dc-val" id="donut-total">23</div><div class="dc-lbl">tuần</div></div></div><div class="donut-legend" id="donut-legend"></div></div>
+<div class="chart-box"><h4>Volume & D+ progression</h4><p style="font-size:11px;color:var(--tx3);margin-bottom:4px">Hover để xem chi tiết. Điểm vàng = deload/step-back.</p><div class="vol-wrap"><canvas id="vol-canvas"></canvas><div class="vol-tooltip" id="vol-tooltip"><div class="vt-week"></div><div class="vt-row"></div></div></div><div class="vol-chart-label">W1 → W<span id="total-weeks-label">23</span></div></div>
+</div>
+</div>
+
+<div class="divider"></div>
+<div class="section">
+<div class="section-label">Phần 03</div>
+<h2>Cấu hình Volume & D+ <span class="changed-badge" id="changed-badge" style="display:none">Đã thay đổi</span></h2>
+<p>Kéo slider để điều chỉnh multiplier từng tuần. Volume (km) và D+ (m) tự động cập nhật. Nhấn "Cập nhật plan" để apply.</p>
+<div id="config-container"></div>
+<button class="btn-primary" id="btn-update" disabled onclick="generate();" style="margin-top:16px">Cập nhật plan →</button>
+</div>
+
+<div class="divider"></div>
+<div class="section">
+<div class="section-label">Phần 04</div>
+<h2>Phương pháp luận</h2>
+<div class="formula-grid">
+<div class="formula-card"><div class="f-name">Volume tuần</div><div class="f-formula">Run = V × multiplier</div><div class="f-desc">V = TB 4 tuần. Multiplier config bảng trên.</div></div>
+<div class="formula-card"><div class="f-name">D+ tuần</div><div class="f-formula">D+ = Race_D+ × Block_D%  × mult</div><div class="f-desc">D% tăng dần: Base 30-45%, Specific 55-65%. Default, coach adjust.</div></div>
+<div class="formula-card"><div class="f-name">Chu kỳ loading</div><div class="f-formula">3:1</div><div class="f-desc">3 tuần load + 1 deload. Step-back trước peak.</div></div>
+<div class="formula-card"><div class="f-name">Cường độ</div><div class="f-formula">Z1-2: 80-92% · Z3: 5-15% · Z4: 2-5%</div><div class="f-desc">Z4: 8-18'/tuần, 2-3 buổi, ≤6'/rep.</div></div>
+<div class="formula-card"><div class="f-name">Long run</div><div class="f-formula">Giờ + D+ target</div><div class="f-desc">2h (deload) → 7-8h (peak). HR-based Block 3+.</div></div>
+<div class="formula-card"><div class="f-name">Rest day</div><div class="f-formula">T6 = Rest / Optional</div><div class="f-desc">6 bắt buộc + 1 optional/tuần.</div></div>
+</div>
+<h3>Cấu trúc tuần</h3>
+<table class="week-table">
+<tr><th style="width:40px">Ngày</th><th style="text-align:left">Session</th><th style="text-align:left">Mục đích</th></tr>
+<tr><td>T2</td><td style="text-align:left">Cross-training recovery</td><td style="text-align:left">Active recovery, zero impact</td></tr>
+<tr><td>T3</td><td style="text-align:left">Aerobic → Tempo (B3+)</td><td style="text-align:left">Aerobic base → Tempo + Z4 pickups</td></tr>
+<tr><td>T4</td><td style="text-align:left">Strength + shakeout</td><td style="text-align:left">Lower body, core, injury prevention</td></tr>
+<tr><td>T5</td><td style="text-align:left">Hill repeats / sustained</td><td style="text-align:left">Muscular endurance + Z4 rep cuối</td></tr>
+<tr><td>T6</td><td style="text-align:left;color:var(--tx3)"><em>Rest / Optional</em></td><td style="text-align:left;color:var(--tx3)"><em>VĐV tự chọn: nghỉ, walk, shakeout</em></td></tr>
+<tr><td>T7</td><td style="text-align:left">Long run (giờ + D+)</td><td style="text-align:left">Time on feet, vertical, nutrition</td></tr>
+<tr><td>CN</td><td style="text-align:left">STR B (B1) / B2B (B2+)</td><td style="text-align:left">Recovery → Pre-fatigued running</td></tr>
+</table>
+</div>
+
+<div class="divider"></div>
+<div class="section" id="blocks-container"></div>
+
+<div class="divider"></div>
+<div class="section"><div class="section-label">Phần 06</div><h2>Pattern deload</h2><div id="deload-table"></div></div>
+
+<div class="divider"></div>
+<div class="section">
+<div class="section-label">Phần 07</div>
+<h2>Cơ sở khoa học</h2>
+<div class="ref-card"><div class="ref-author">Jason Koop</div><div class="ref-book">Training Essentials for Ultrarunning (2nd Ed.)</div><div class="ref-principles"><strong>Áp dụng:</strong> Periodization, long run theo giờ, 80/20, B2B, race rehearsal, D+ weekly target = 60-75% race D+ ở peak week. "Run more, slowly."</div></div>
+<div class="ref-card"><div class="ref-author">Scott Johnston, Steve House & Kilian Jornet</div><div class="ref-book">Training for the Uphill Athlete</div><div class="ref-principles"><strong>Áp dụng:</strong> AeT drift test, 3:1, aerobic hours, AeT-AnT gap, strength periodization, vertical = independent training variable.</div></div>
+<div class="ref-card"><div class="ref-author">Steve Magness</div><div class="ref-book">Science of Running</div><div class="ref-principles"><strong>Áp dụng:</strong> Phân cực, cross-training, unilateral strength, taper, micro-dose Z4 maintain threshold.</div></div>
+<div class="ref-card"><div class="ref-author">Renato Canova</div><div class="ref-book">Marathon Training: A Scientific Approach</div><div class="ref-principles"><strong>Áp dụng:</strong> Specific periodization, step-back bảo vệ key session, race rehearsal, progressive effort Z2→Z3→Z4.</div></div>
+</div>
+<div class="divider"></div>
+<div style="text-align:center;padding:1rem 0;color:var(--tx3);font-size:11px;font-family:var(--mono)"><p>Trail Ultra Training Template v7.0</p><p>Lưu ý: Vấn đề chấn thương nghiêm trọng → tham khảo bác sĩ chuyên khoa.</p></div>
+</div>
+</div>
+
+<script>
+const BC={b1:'#5DCAA5',b1t:'#04342C',b2:'#1D9E75',b2t:'#fff',b3:'#EF9F27',b3t:'#412402',b4:'#BA7517',b4t:'#fff',b5:'#85B7EB',b5t:'#042C53',b6:'#ED93B1',b6t:'#4B1528'};
+const BK=[
+{id:'b1',name:'Early Base',label:'B1',ratio:.22,color:BC.b1,tc:BC.b1t,cls:'bh-base',phase:'Base',dpct:.30,
+ focus:'Kỷ luật Z1-Z2, AeT baseline, strength 2×/wk, hill intro. Z4 pickups.',
+ dist:[{w:40,c:'var(--accent-m)',l:'Z1'},{w:38,c:'var(--green)',l:'Z2'},{w:10,c:'#c25a3a',l:'Hill'},{w:7,c:'var(--purple)',l:'STR'},{w:5,c:'var(--warn)',l:'Z4'}],
+ defMult:[.90,.95,1.05,.89],roles:['Assessment','Build','Peak','Deload'],isPeak:[0,0,1,0],isDl:[0,0,0,1],
+ lr:['3h','3h15','3h45','2h'],b2b:['—','—','—','—'],hill:["5×3'","6×3'","6×4'","4×3'"],str:['2×/wk','2×/wk','2× (B red.)','1× (50%)'],it:['110','115','125','85'],z4:['5×60s','5×60s','5×90s','—'],
+ checks:['AeT drift test baseline','IT ổn định 100-135%','Base Fitness +8-16 điểm']},
+{id:'b2',name:'Late Base',label:'B2',ratio:.22,color:BC.b2,tc:BC.b2t,cls:'bh-base2',phase:'Base',dpct:.45,
+ focus:'Volume V×1.30, vertical tăng, hill Z2→Z3, B2B từ W5, strength 1×/wk gộp. AeT re-test.',
+ dist:[{w:30,c:'var(--accent-m)',l:'Z1'},{w:38,c:'var(--green)',l:'Z2'},{w:7,c:'#EF9F27',l:'Z3'},{w:13,c:'#c25a3a',l:'Hill'},{w:7,c:'var(--purple)',l:'STR'},{w:5,c:'var(--warn)',l:'Z4'}],
+ defMult:[1.05,1.20,1.30,1.11],roles:['Re-entry','Build','Peak','Deload'],isPeak:[0,0,1,0],isDl:[0,0,0,1],
+ lr:['3h','4h D+','6h','2h'],b2b:['1h30','2h','2h','—'],hill:["6×4'","5×4' Z2→Z3","6×4' Z2→Z3","4×3'"],str:['1×/wk','1×','1× (red.)','1× (50%)'],it:['115','125','130','80'],z4:['5×90s','5×90s+hill','5×90s+hill','—'],
+ checks:['AeT re-test cải thiện','Endurance ≥2-3 điểm > Threshold','B2B hoàn thành']},
+{id:'b3',name:'Early Specific',label:'B3',ratio:.22,color:BC.b3,tc:BC.b3t,cls:'bh-spec',phase:'Specific',dpct:.55,
+ focus:'Tempo A/B luân phiên, hill sustained 3-4×8-10\', long run HR-based 20-30% Z3, B2B weekly. Z4 finishing kick.',
+ dist:[{w:25,c:'var(--accent-m)',l:'Z1'},{w:33,c:'var(--green)',l:'Z2'},{w:15,c:'#EF9F27',l:'Z3'},{w:10,c:'#c25a3a',l:'Hill'},{w:12,c:'var(--warn)',l:'Z4'},{w:5,c:'var(--purple)',l:'STR'}],
+ defMult:[1.20,1.25,1.30,1.11],roles:['Re-entry','Build','Peak','Deload'],isPeak:[0,0,1,0],isDl:[0,0,0,1],
+ lr:['4h','5h','5h','2h'],b2b:['1h30','2h','2h','—'],hill:["3×8'","3×10'","4×8'","3×6'"],str:['1×','1×','1×','1× (50%)'],it:['115','125','125','80'],tempo:["A:3×10'","B:35'","A:4×10'",'—'],z4:['FK+hill','FK+hill','FK+hill','—'],
+ checks:['Tempo không drift Z4 sớm','Long run 20-30% Z3','B2B weekly OK']},
+{id:'b4',name:'Late Specific',label:'B4',ratio:.34,color:BC.b4,tc:BC.b4t,cls:'bh-spec2',phase:'Specific',dpct:.65,
+ focus:'Race rehearsal 7-8h, peak B2B, V×1.35, uphill/downhill, chạy khi mệt. Step-back trước peak. Z4 ~18\'/wk.',
+ dist:[{w:22,c:'var(--accent-m)',l:'Z1'},{w:30,c:'var(--green)',l:'Z2'},{w:18,c:'#EF9F27',l:'Z3'},{w:12,c:'#c25a3a',l:'Hill'},{w:14,c:'var(--warn)',l:'Z4'},{w:4,c:'var(--purple)',l:'STR'}],
+ defMult:[1.20,1.30,1.10,1.35,1.25,1.20],roles:['Re-entry','Build','Step-back','Peak','Sustained','Sustained'],isPeak:[0,0,0,1,0,0],isDl:[0,0,2,0,0,0],
+ lr:['4h','5h','3h','7-8h ★','5h','4h'],b2b:['2h','2h30','1h30','3h','2h','2h'],hill:["3×10'","3×12'","3×8'","2×15'","3×10'","3×8'"],str:['1×','1×','1×','1×(r)','1×','1×'],it:['115','125','100','130','120','115'],tempo:["B:30'","A:4×10'","B:25'",'A/B','A/B',"B:30'"],z4:['FK+hill','FK+hill','Reduced','Peak','FK+hill','FK+hill'],
+ checks:['Race rehearsal 7-8h complete','Gear test OK','Peak B2B sustainable']},
+{id:'b5',name:'Taper & Race',label:'B5',ratio:null,color:BC.b5,tc:BC.b5t,cls:'bh-taper',phase:'Taper',fixed:3,dpct:.25,
+ focus:'Taper 1: V×0.85, vẫn tempo ngắn + hill. Taper 2: V×0.60. Race week: V×0.35, travel, shakeout, RACE DAY.',
+ dist:[{w:45,c:'var(--accent-m)',l:'Z1'},{w:33,c:'var(--green)',l:'Z2'},{w:10,c:'#EF9F27',l:'Z3'},{w:9,c:'var(--warn)',l:'Z4'},{w:3,c:'#c25a3a',l:'Hill'}],
+ defMult:[.85,.60,.35],roles:['Taper 1','Taper 2','Race week'],isPeak:[0,0,0],isDl:[0,0,0],
+ lr:['3h','2h','Shakeout 1h'],b2b:['—','—','—'],hill:["3×6'","2×5'",'—'],str:['—','—','—'],it:['95','85','—'],tempo:["2×8'","1×10'",'—'],z4:["2×2'","2×2'","strides"],
+ checks:['IT → Performance (50-79%)','Running Perf >100%','Race day ready']}
+];
+
+let STATE={weekMults:[],weekData:[],bw:[],Va:70,raceDp:8800,dirty:false};
+
+function addDays(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
+function fmtD(d){return d.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'});}
+function fmtS(d){return d.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit'});}
+
+function calcBlockWeeks(totalW){
+  const fx=3,fl=totalW-fx,bw=[];
+  BK.forEach(b=>bw.push(b.fixed||Math.max(3,Math.round(fl*b.ratio))));
+  let s=bw.reduce((a,b)=>a+b,0);
+  while(s<totalW){bw[3]++;s++;}
+  while(s>totalW){if(bw[3]>4){bw[3]--;s--;}else if(bw[0]>3){bw[0]--;s--;}else{bw[1]--;s--;}}
+  return bw;
+}
+
+function buildDefaultMults(bw){
+  const m=[];
+  BK.forEach((b,i)=>{for(let w=0;w<bw[i];w++)m.push(b.defMult[w%b.defMult.length]);});
+  return m;
+}
+
+function computeWeekData(Va,raceDp,bw,mults){
+  const wd=[];let wc=0;
+  BK.forEach((b,bi)=>{
+    for(let wi=0;wi<bw[bi];wi++){
+      const m=mults[wc]||0.35;
+      const km=Math.round(Va*m);
+      const dp=Math.round(raceDp*b.dpct*m);
+      const si=wi%b.roles.length;
+      wd.push({week:wc+1,km,dp,mult:m,block:bi,bName:b.label,phase:b.phase,role:b.roles[si],isPeak:b.isPeak[si],isDl:b.isDl[si]});
+      wc++;
+    }
+  });
+  return wd;
+}
+
+function markDirty(){
+  STATE.dirty=true;
+  document.getElementById('btn-update').disabled=false;
+  const badge=document.getElementById('changed-badge');
+  if(badge)badge.style.display='inline-block';
+}
+
+function generate(){
+  const name=document.getElementById('in-name').value||'Race';
+  const dist=+document.getElementById('in-dist').value||161;
+  const raceDp=+document.getElementById('in-race-dplus').value||8800;
+  const startD=new Date(document.getElementById('in-start').value);
+  const raceD=new Date(document.getElementById('in-race').value);
+  const V=+document.getElementById('in-v').value||70;
+  const cross=document.getElementById('in-cross').value;
+  const totalW=Math.floor((raceD-startD)/(864e5*7));
+  const wb=document.getElementById('warn-box');
+  if(totalW<16){wb.style.display='block';wb.textContent='⚠️ Chỉ có '+totalW+' tuần (cần ≥16). Điều chỉnh ngày.';document.getElementById('gen-content').style.display='none';return;}
+  wb.style.display='none';
+
+  const Va=cross==='easyrun'?Math.round(V*.93):V;
+  const bw=calcBlockWeeks(totalW);
+  let mults;
+  if(STATE.dirty&&STATE.weekMults.length===totalW){mults=STATE.weekMults;}
+  else{mults=buildDefaultMults(bw);STATE.weekMults=mults;}
+  
+  const wd=computeWeekData(Va,raceDp,bw,mults);
+  STATE={weekMults:mults,weekData:wd,bw,Va,raceDp,dirty:false};
+  
+  document.getElementById('btn-update').disabled=true;
+  const badge=document.getElementById('changed-badge');if(badge)badge.style.display='none';
+
+  const totalRun=wd.reduce((s,w)=>s+w.km,0);
+  const totalDp=wd.reduce((s,w)=>s+w.dp,0);
+  const peakKm=Math.max(...wd.map(w=>w.km));
+  const peakDp=Math.max(...wd.map(w=>w.dp));
+
+  document.getElementById('results-grid').innerHTML=
+    `<div class="result-card"><div class="val">${totalW}</div><div class="lbl">Tuần</div></div>
+     <div class="result-card"><div class="val">${Va}</div><div class="lbl">V adj</div></div>
+     <div class="result-card"><div class="val">${totalRun.toLocaleString()}</div><div class="lbl">Total km</div></div>
+     <div class="result-card"><div class="val">${(totalDp/1000).toFixed(0)}k</div><div class="lbl">Total D+</div></div>`;
+
+  // Timeline
+  const tl=document.getElementById('tl-bar'),td=document.getElementById('tl-dates');
+  tl.innerHTML='';td.innerHTML='';
+  let cd=new Date(startD);const bRanges=[];
+  BK.forEach((b,i)=>{const bs=new Date(cd);cd=addDays(cd,bw[i]*7);bRanges.push({s:bs,e:addDays(cd,-1)});
+    tl.innerHTML+=`<div class="tl-seg" style="flex:${bw[i]};background:${b.color};color:${b.tc}">${b.label}<span class="tl-weeks">${bw[i]}w</span></div>`;
+    td.innerHTML+=`<div class="tl-date" style="flex:${bw[i]}">${fmtS(bs)}</div>`;
+  });
+
+  document.getElementById('donut-total').textContent=totalW;
+  document.getElementById('total-weeks-label').textContent=totalW;
+  drawDonut(bw,totalW);
+  drawVolChart(wd);
+  buildConfig(wd,bw,Va,raceDp);
+  buildBlocks(wd,bw,bRanges,name,dist,raceDp);
+  buildDeload(wd,bw,totalW);
+  document.getElementById('gen-content').style.display='block';
+}
+
+function buildConfig(wd,bw,Va,raceDp){
+  const c=document.getElementById('config-container');
+  let html='';let gi=0;
+  BK.forEach((b,bi)=>{
+    html+=`<div class="block-config"><div class="bc-header" style="background:${b.color};color:${b.tc}">${b.label} — ${b.name} <span class="bc-phase">${b.phase} · D% ${Math.round(b.dpct*100)}%</span></div><div class="bc-body">`;
+    html+=`<div class="bc-slider-row" style="border-bottom:1px solid var(--border);padding-bottom:4px;margin-bottom:4px"><span class="bc-wk" style="font-weight:500;color:var(--tx)">Tuần</span><span style="font-size:10px;color:var(--tx3)">Multiplier</span><span style="font-size:10px;color:var(--tx3);text-align:center">×</span><span style="font-size:10px;color:var(--tx3);text-align:right">Run</span><span style="font-size:10px;color:var(--tx3);text-align:right">D+</span></div>`;
+    let bKm=0,bDp=0;
+    for(let wi=0;wi<bw[bi];wi++){
+      const w=wd[gi];const pk=w.isPeak;const dl=w.isDl;
+      const cls=pk?'is-peak':dl?'is-deload':'';
+      const thumbColor=pk?BC.b1t:b.color;
+      html+=`<div class="bc-slider-row ${cls}">
+        <span class="bc-wk">W${w.week} ${pk?'★':''}</span>
+        <input type="range" min="0.20" max="1.60" step="0.05" value="${w.mult.toFixed(2)}" data-idx="${gi}" oninput="onSlider(this)" style="accent-color:${b.color}">
+        <span class="bc-mult" id="sm-${gi}">×${w.mult.toFixed(2)}</span>
+        <span class="bc-km" id="sk-${gi}">${w.km} km</span>
+        <span class="bc-dp" id="sd-${gi}">${w.dp.toLocaleString()}</span>
+      </div>`;
+      bKm+=w.km;bDp+=w.dp;gi++;
+    }
+    html+=`</div><div class="bc-summary"><span><strong>${bKm}</strong> km</span><span><strong>${(bDp/1000).toFixed(1)}k</strong> D+</span><span>${bw[bi]} tuần</span></div></div>`;
+  });
+  c.innerHTML=html;
+}
+
+function onSlider(el){
+  const idx=+el.dataset.idx;
+  const val=parseFloat(el.value);
+  STATE.weekMults[idx]=val;
+  const Va=STATE.Va,raceDp=STATE.raceDp;
+  const w=STATE.weekData[idx];
+  const b=BK[w.block];
+  const km=Math.round(Va*val);
+  const dp=Math.round(raceDp*b.dpct*val);
+  document.getElementById('sm-'+idx).textContent='×'+val.toFixed(2);
+  document.getElementById('sk-'+idx).textContent=km+' km';
+  document.getElementById('sd-'+idx).textContent=dp.toLocaleString();
+  markDirty();
+}
+
+function drawDonut(bw,tw){
+  const cv=document.getElementById('donut-canvas'),ctx=cv.getContext('2d');
+  const dpr=window.devicePixelRatio||1;cv.style.width='200px';cv.style.height='200px';
+  cv.width=200*dpr;cv.height=200*dpr;ctx.scale(dpr,dpr);
+  const cx=100,cy=100,r=80,lw=24;ctx.clearRect(0,0,200,200);
+  const ph=[{n:'Base',w:bw[0]+bw[1],c:BC.b1},{n:'Specific',w:bw[2]+bw[3],c:BC.b3},{n:'Taper & Race',w:bw[4],c:BC.b5}];
+  let a=-Math.PI/2;
+  ph.forEach(p=>{const sw=2*Math.PI*p.w/tw;ctx.beginPath();ctx.arc(cx,cy,r,a,a+sw);ctx.strokeStyle=p.c;ctx.lineWidth=lw;ctx.lineCap='butt';ctx.stroke();a+=sw;});
+  const dk=matchMedia('(prefers-color-scheme:dark)').matches;
+  ctx.beginPath();ctx.arc(cx,cy,r-lw/2-2,0,2*Math.PI);ctx.fillStyle=dk?'#141310':'#faf9f6';ctx.fill();
+  const lg=document.getElementById('donut-legend');lg.innerHTML='';
+  ph.forEach(p=>{lg.innerHTML+=`<div class="dl-row"><span class="dl-dot" style="background:${p.c}"></span>${p.n} (${p.w}w)<span class="dl-pct">${Math.round(p.w/tw*100)}%</span></div>`;});
+}
+
+function drawVolChart(wd){
+  const wrap=document.querySelector('.vol-wrap'),cv=document.getElementById('vol-canvas'),tt=document.getElementById('vol-tooltip');
+  const ctx=cv.getContext('2d');const dpr=window.devicePixelRatio||1;
+  const rect=wrap.getBoundingClientRect();cv.width=rect.width*dpr;cv.height=rect.height*dpr;
+  cv.style.width=rect.width+'px';cv.style.height=rect.height+'px';ctx.scale(dpr,dpr);
+  const W=rect.width,H=rect.height,pad={t:20,r:20,b:28,l:50},cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+  const n=wd.length,maxK=Math.max(...wd.map(w=>w.km))*1.15;
+  const dk=matchMedia('(prefers-color-scheme:dark)').matches;
+  const gc=dk?'rgba(255,255,255,.06)':'rgba(0,0,0,.06)',tc=dk?'#6e6d69':'#8c8b86',lc=dk?'#5dcaa5':'#1a5c54';
+  ctx.clearRect(0,0,W,H);
+  for(let i=0;i<=4;i++){const y=pad.t+ch*(1-i/4);ctx.strokeStyle=gc;ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cw,y);ctx.stroke();
+    ctx.fillStyle=tc;ctx.font='10px "DM Mono"';ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillText(Math.round(maxK*i/4),pad.l-6,y);}
+  // Block bg bands
+  let bStart=0;
+  BK.forEach((b,bi)=>{
+    const bEnd=bStart+STATE.bw[bi];
+    const x1=pad.l+(bStart>0?bStart-.5:0)*(cw/(n-1));
+    const x2=pad.l+Math.min(bEnd-.5,n-1)*(cw/(n-1));
+    ctx.fillStyle=dk?b.color+'10':b.color+'08';
+    ctx.fillRect(x1,pad.t,x2-x1,ch);
+    bStart=bEnd;
+  });
+  // Area
+  ctx.beginPath();wd.forEach((w,i)=>{const x=pad.l+i*(cw/(n-1)),y=pad.t+ch*(1-w.km/maxK);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+  ctx.lineTo(pad.l+(n-1)*(cw/(n-1)),pad.t+ch);ctx.lineTo(pad.l,pad.t+ch);ctx.closePath();
+  const gr=ctx.createLinearGradient(0,pad.t,0,pad.t+ch);gr.addColorStop(0,dk?'rgba(93,202,165,.18)':'rgba(59,155,143,.12)');gr.addColorStop(1,'transparent');ctx.fillStyle=gr;ctx.fill();
+  // Line
+  ctx.beginPath();ctx.strokeStyle=lc;ctx.lineWidth=2;ctx.lineJoin='round';
+  wd.forEach((w,i)=>{const x=pad.l+i*(cw/(n-1)),y=pad.t+ch*(1-w.km/maxK);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.stroke();
+  // Dots
+  const dots=[];
+  wd.forEach((w,i)=>{
+    const x=pad.l+i*(cw/(n-1)),y=pad.t+ch*(1-w.km/maxK);
+    const isSpecial=w.isDl||w.mult<=0.80;
+    ctx.beginPath();ctx.arc(x,y,w.isPeak?5:3,0,Math.PI*2);
+    if(w.isPeak){ctx.fillStyle=dk?'#5dcaa5':'#1a5c54';ctx.strokeStyle=dk?'#e4e2dc':'#fff';ctx.lineWidth=2;}
+    else if(isSpecial){ctx.fillStyle=dk?'#e8b06a':'#BA7517';ctx.strokeStyle=dk?'#332a18':'#7a4b14';ctx.lineWidth=1.5;}
+    else{ctx.fillStyle=dk?'#1a3330':'#e8f5f2';ctx.strokeStyle=lc;ctx.lineWidth=1.5;}
+    ctx.fill();ctx.stroke();dots.push({x,y,w});
+  });
+  ctx.fillStyle=tc;ctx.font='9px "DM Mono"';ctx.textAlign='center';ctx.textBaseline='top';
+  wd.forEach((w,i)=>{if(i%Math.max(1,Math.floor(n/12))===0||i===n-1)ctx.fillText('W'+w.week,pad.l+i*(cw/(n-1)),pad.t+ch+8);});
+  // Hover
+  cv.onmousemove=function(e){
+    const br=cv.getBoundingClientRect(),mx=e.clientX-br.left;
+    let cl=null,md=Infinity;dots.forEach(d=>{const dd=Math.abs(d.x-mx);if(dd<md){md=dd;cl=d;}});
+    if(cl&&md<cw/n*1.5){
+      tt.style.display='block';
+      tt.querySelector('.vt-week').textContent='W'+cl.w.week+' · '+cl.w.bName+' '+cl.w.role+(cl.w.isPeak?' ★':'');
+      tt.querySelector('.vt-row').innerHTML='Run: <strong>'+cl.w.km+'</strong> km · D+: <strong>'+cl.w.dp.toLocaleString()+'</strong> m<br>×'+cl.w.mult.toFixed(2)+' · '+cl.w.phase;
+      let tx=cl.x+12,ty=cl.y-70;if(tx+180>W)tx=cl.x-190;if(ty<0)ty=cl.y+12;
+      tt.style.left=tx+'px';tt.style.top=ty+'px';
+    }else tt.style.display='none';
+  };
+  cv.onmouseleave=()=>{tt.style.display='none';};
+}
+
+function buildBlocks(wd,bw,bRanges,name,dist,raceDp){
+  const bc=document.getElementById('blocks-container');
+  bc.innerHTML='<div class="section-label">Phần 05</div><h2>Chi tiết từng block</h2>';
+  let gi=0;
+  BK.forEach((b,bi)=>{
+    const nw=bw[bi],br=bRanges[bi];
+    let h=`<div class="block-header ${b.cls}"><div class="b-label" style="color:${b.color}">${b.label} · W${gi+1}—W${gi+nw}</div><h3>${b.name}</h3><div class="b-dates">${fmtD(br.s)} → ${fmtD(br.e)}</div><div class="b-focus"><strong>Focus:</strong> ${b.focus}</div></div>`;
+    const bVol=wd.slice(gi,gi+nw).reduce((s,w)=>s+w.km,0);
+    const bDp=wd.slice(gi,gi+nw).reduce((s,w)=>s+w.dp,0);
+    const b2bc=bi>=1&&bi<=3?nw-1:0;
+    h+=`<div class="block-metrics"><div class="bm"><div class="val">${bVol}</div><div class="lbl">Run km</div></div><div class="bm"><div class="val">${(bDp/1000).toFixed(1)}k</div><div class="lbl">D+ (m)</div></div><div class="bm"><div class="val">${b2bc||'—'}</div><div class="lbl">B2B</div></div></div>`;
+    if(b.dist.length){h+=`<div class="dist-bar-wrap"><div class="dist-bar-label">Phân bổ cường độ</div><div class="dist-bar">`;b.dist.forEach(d=>{h+=`<div class="seg" style="width:${d.w}%;background:${d.c}"></div>`;});h+=`</div><div class="dist-legend">`;b.dist.forEach(d=>{h+=`<span><span class="dot" style="background:${d.c}"></span>${d.l} ${d.w}%</span>`;});h+=`</div></div>`;}
+    if(b.roles.length&&b.id!=='b6'){
+      const hasT=!!b.tempo;
+      h+=`<table class="week-table"><tr><th>Tuần</th><th>Role</th><th>Vol</th><th>D+</th><th>Long</th><th>B2B</th>`;if(hasT)h+=`<th>Tempo</th>`;h+=`<th>Hill</th><th>STR</th><th>Z4</th><th>IT%</th></tr>`;
+      for(let wi=0;wi<nw;wi++){
+        const si=wi%b.roles.length;const w=wd[gi+wi];
+        const rc=w.isPeak?'row-pk':w.isDl===1?'row-dl':w.isDl===2?'row-sb':'';
+        const tg=w.isPeak?'<span class="tag tag-pk">Peak</span>':w.isDl===1?'<span class="tag tag-dl">Deload</span>':w.isDl===2?'<span class="tag tag-sb">Step-back</span>':'';
+        h+=`<tr${rc?' class="'+rc+'"':''}><td>W${w.week}</td><td>${tg}</td><td>${w.km}</td><td>${w.dp.toLocaleString()}</td><td>${b.lr[si]||'—'}</td><td>${b.b2b[si]||'—'}</td>`;
+        if(hasT)h+=`<td>${(b.tempo&&b.tempo[si])||'—'}</td>`;
+        h+=`<td>${b.hill[si]||'—'}</td><td>${b.str[si]||'—'}</td><td style="font-size:10px">${(b.z4&&b.z4[si])||'—'}</td><td>${b.it[si]||'—'}</td></tr>`;
+      }
+      h+=`</table>`;
+    }
+    if(b.id==='b6'){h+=`<table class="week-table"><tr><th>Phase</th><th style="text-align:left">Activity</th></tr><tr><td>Travel</td><td style="text-align:left">Acclimatize, shakeout, gear check</td></tr><tr class="row-pk"><td>Race</td><td style="text-align:left"><strong>${name} — ${dist}km · ${raceDp.toLocaleString()}m D+</strong></td></tr></table>`;}
+    if(b.id==='b3')h+=`<div class="coach-note"><strong>Long run HR:</strong> Z3 khi leo dốc = OK. >30% Z3 → kiềm chế. Z4+ = không.</div>`;
+    if(b.id==='b4')h+=`<div class="coach-note"><strong>Race rehearsal:</strong> 7-8h, full nutrition mỗi 45\', mandatory gear, terrain giống race. Step-back trước = fresh.</div>`;
+    if(b.id==='b5')h+=`<div class="coach-note"><strong>Taper:</strong> "Mất fitness" = bình thường. Base Fitness giảm = đúng kế hoạch. Perf >100% = peaking.</div>`;
+    if(b.checks.length){h+=`<div class="checkpoint"><div class="cp-title">Checkpoint</div>`;b.checks.forEach(c=>{h+=`<p>☐ ${c}</p>`;});h+=`</div>`;}
+    bc.innerHTML+=h;gi+=nw;
+  });
+}
+
+function buildDeload(wd,bw,tw){
+  const dt=document.getElementById('deload-table');
+  let h=`<table class="week-table"><tr><th>Tuần</th><th>Type</th><th>×</th><th style="text-align:left">Mục đích</th></tr>`;
+  wd.forEach(w=>{
+    if(w.isDl===1)h+=`<tr class="row-dl"><td>W${w.week}</td><td><span class="tag tag-dl">Deload</span></td><td>×${w.mult.toFixed(2)}</td><td style="text-align:left;font-family:var(--sans);font-size:12px">Supercompensation</td></tr>`;
+    if(w.isDl===2)h+=`<tr class="row-sb"><td>W${w.week}</td><td><span class="tag tag-sb">Step-back</span></td><td>×${w.mult.toFixed(2)}</td><td style="text-align:left;font-family:var(--sans);font-size:12px">Bảo vệ peak long run</td></tr>`;
+  });
+  h+=`<tr><td>W${tw-4}—${tw-2}</td><td>Taper</td><td>×0.85→0.35</td><td style="text-align:left;font-family:var(--sans);font-size:12px">Race peaking</td></tr></table>`;
+  dt.innerHTML=h;
+}
+
+window.addEventListener('resize',()=>{if(document.getElementById('gen-content').style.display!=='none'&&STATE.weekData.length){drawVolChart(STATE.weekData);drawDonut(STATE.bw,STATE.weekData.length);}});
+</script>
+</body>
+</html>
