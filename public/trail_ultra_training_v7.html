@@ -38,7 +38,7 @@
 .tl-seg{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;letter-spacing:.3px;flex-direction:column;gap:1px;min-width:30px}
 .tl-seg .tl-weeks{font-family:var(--mono);font-size:9px;opacity:.8}
 .tl-dates-row{display:flex;margin-bottom:16px}.tl-dates-row .tl-date{font-family:var(--mono);font-size:9px;color:var(--tx3);text-align:center}
-.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:20px 0;align-items:start}
+.charts-row{display:flex;flex-direction:column;gap:24px;margin:20px 0}
 .chart-box h4{font-size:12px;font-weight:500;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
 .donut-wrap{position:relative;width:200px;height:200px;margin:0 auto}
 .donut-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
@@ -48,7 +48,7 @@
 .donut-legend .dl-row{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tx2)}
 .donut-legend .dl-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
 .donut-legend .dl-pct{font-family:var(--mono);font-size:11px;color:var(--tx3);margin-left:auto}
-.vol-wrap{position:relative;height:200px}.vol-wrap canvas{width:100%;height:100%;cursor:crosshair}
+.vol-wrap{position:relative;width:100%;height:220px}.vol-wrap canvas{display:block;cursor:crosshair}
 .vol-tooltip{position:absolute;pointer-events:none;background:var(--bg);border:.5px solid var(--border);border-radius:8px;padding:8px 12px;font-size:11px;display:none;z-index:10;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.1)}
 .vol-tooltip .vt-week{font-weight:500;color:var(--tx);margin-bottom:2px}.vol-tooltip .vt-row{color:var(--tx2);font-family:var(--mono);line-height:1.6}
 .vol-chart-label{font-size:10px;color:var(--tx3);text-align:center;font-family:var(--mono);margin-top:4px}
@@ -104,7 +104,7 @@
 .checkpoint .cp-title{font-size:12px;font-weight:500;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}.checkpoint p{font-size:12px;color:var(--tx2);margin-bottom:4px}
 .ref-card{background:var(--bg2);border-radius:10px;padding:16px 20px;margin-bottom:12px}
 .ref-card .ref-author{font-weight:500;font-size:13px;color:var(--tx);margin-bottom:2px}.ref-card .ref-book{font-style:italic;font-size:12px;color:var(--tx3);margin-bottom:8px}.ref-card .ref-principles{font-size:12px;color:var(--tx2);line-height:1.6}
-@media(max-width:600px){.input-grid,.formula-grid{grid-template-columns:1fr}.results-grid{grid-template-columns:repeat(2,1fr)}.charts-row{grid-template-columns:1fr}.bc-slider-row{grid-template-columns:60px 1fr 50px 60px 60px;gap:4px}.hero h1{font-size:26px}}
+@media(max-width:600px){.input-grid,.formula-grid{grid-template-columns:1fr}.results-grid{grid-template-columns:repeat(2,1fr)}.bc-slider-row{grid-template-columns:60px 1fr 50px 60px 60px;gap:4px}.hero h1{font-size:26px}.vol-wrap{height:180px}.donut-wrap{width:160px;height:160px}.week-table{display:block;overflow-x:auto}.block-config{margin:0 -1rem;border-radius:0;border-left:0;border-right:0}}
 </style>
 </head>
 <body>
@@ -324,12 +324,15 @@ function generate(){
 
   document.getElementById('donut-total').textContent=totalW;
   document.getElementById('total-weeks-label').textContent=totalW;
-  drawDonut(bw,totalW);
-  drawVolChart(wd);
   buildConfig(wd,bw,Va,raceDp);
   buildBlocks(wd,bw,bRanges,name,dist,raceDp);
   buildDeload(wd,bw,totalW);
   document.getElementById('gen-content').style.display='block';
+  // Draw charts after layout is complete
+  requestAnimationFrame(()=>{
+    drawDonut(bw,totalW);
+    drawVolChart(wd);
+  });
 }
 
 function buildConfig(wd,bw,Va,raceDp){
@@ -374,14 +377,18 @@ function onSlider(el){
 
 function drawDonut(bw,tw){
   const cv=document.getElementById('donut-canvas'),ctx=cv.getContext('2d');
-  const dpr=window.devicePixelRatio||1;cv.style.width='200px';cv.style.height='200px';
-  cv.width=200*dpr;cv.height=200*dpr;ctx.scale(dpr,dpr);
-  const cx=100,cy=100,r=80,lw=24;ctx.clearRect(0,0,200,200);
+  const wrap=cv.parentElement;
+  const size=wrap.clientWidth||wrap.offsetWidth||200;
+  const dpr=window.devicePixelRatio||1;
+  cv.style.width=size+'px';cv.style.height=size+'px';
+  cv.width=size*dpr;cv.height=size*dpr;ctx.scale(dpr,dpr);
+  const cx=size/2,cy=size/2,r=size*0.4,lw=size*0.12;ctx.clearRect(0,0,size,size);
   const ph=[{n:'Base',w:bw[0]+bw[1],c:BC.b1},{n:'Specific',w:bw[2]+bw[3],c:BC.b3},{n:'Taper & Race',w:bw[4],c:BC.b5}];
   let a=-Math.PI/2;
   ph.forEach(p=>{const sw=2*Math.PI*p.w/tw;ctx.beginPath();ctx.arc(cx,cy,r,a,a+sw);ctx.strokeStyle=p.c;ctx.lineWidth=lw;ctx.lineCap='butt';ctx.stroke();a+=sw;});
   const dk=matchMedia('(prefers-color-scheme:dark)').matches;
   ctx.beginPath();ctx.arc(cx,cy,r-lw/2-2,0,2*Math.PI);ctx.fillStyle=dk?'#141310':'#faf9f6';ctx.fill();
+  cv.dataset.size=size;
   const lg=document.getElementById('donut-legend');lg.innerHTML='';
   ph.forEach(p=>{lg.innerHTML+=`<div class="dl-row"><span class="dl-dot" style="background:${p.c}"></span>${p.n} (${p.w}w)<span class="dl-pct">${Math.round(p.w/tw*100)}%</span></div>`;});
 }
@@ -389,9 +396,11 @@ function drawDonut(bw,tw){
 function drawVolChart(wd){
   const wrap=document.querySelector('.vol-wrap'),cv=document.getElementById('vol-canvas'),tt=document.getElementById('vol-tooltip');
   const ctx=cv.getContext('2d');const dpr=window.devicePixelRatio||1;
-  const rect=wrap.getBoundingClientRect();cv.width=rect.width*dpr;cv.height=rect.height*dpr;
-  cv.style.width=rect.width+'px';cv.style.height=rect.height+'px';ctx.scale(dpr,dpr);
-  const W=rect.width,H=rect.height,pad={t:20,r:20,b:28,l:50},cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+  const W=wrap.clientWidth||wrap.offsetWidth||600;
+  const H=wrap.clientHeight||wrap.offsetHeight||220;
+  cv.width=W*dpr;cv.height=H*dpr;
+  cv.style.width=W+'px';cv.style.height=H+'px';ctx.scale(dpr,dpr);
+  const pad={t:20,r:20,b:28,l:50},cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
   const n=wd.length,maxK=Math.max(...wd.map(w=>w.km))*1.15;
   const dk=matchMedia('(prefers-color-scheme:dark)').matches;
   const gc=dk?'rgba(255,255,255,.06)':'rgba(0,0,0,.06)',tc=dk?'#6e6d69':'#8c8b86',lc=dk?'#5dcaa5':'#1a5c54';
