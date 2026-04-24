@@ -60,7 +60,7 @@
 .bc-dpct-slider{width:60px;height:3px;-webkit-appearance:none;appearance:none;background:rgba(255,255,255,.3);border-radius:2px;cursor:pointer;margin:0 4px}
 .bc-dpct-slider::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#fff;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.3)}
 .bc-body{padding:0 16px 12px;background:var(--bg)}
-.bc-slider-row{display:grid;grid-template-columns:80px 1fr 60px 80px 80px;gap:8px;align-items:center;padding:6px 0;border-bottom:.5px solid var(--border);font-size:12px}
+.bc-slider-row{display:grid;grid-template-columns:60px 1fr 55px 65px 90px 75px;gap:6px;align-items:center;padding:6px 0;border-bottom:.5px solid var(--border);font-size:12px}
 .bc-slider-row:last-child{border-bottom:none}
 .bc-slider-row .bc-wk{font-family:var(--mono);font-size:11px;color:var(--tx2)}
 .bc-slider-row input[type=range]{width:100%;height:4px;-webkit-appearance:none;appearance:none;background:var(--bg3);border-radius:2px;outline:none}
@@ -68,6 +68,10 @@
 .bc-slider-row .bc-mult{font-family:var(--mono);font-size:12px;font-weight:500;text-align:center;min-width:50px}
 .bc-slider-row .bc-km{font-family:var(--mono);font-size:11px;color:var(--tx2);text-align:right}
 .bc-slider-row .bc-dp{font-family:var(--mono);font-size:11px;color:var(--tx3);text-align:right}
+.bc-wk-dpct{display:flex;align-items:center;gap:4px;justify-content:flex-end}
+.bc-wk-dpct input[type=range]{width:48px;height:3px;-webkit-appearance:none;appearance:none;background:var(--bg3);border-radius:2px;outline:none;cursor:pointer;padding:0}
+.bc-wk-dpct input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:10px;border-radius:50%;background:var(--tx2);cursor:pointer;border:1px solid #fff;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.bc-wk-dpct .bc-wk-dp-val{font-family:var(--mono);font-size:10px;color:var(--tx3);min-width:28px;text-align:right}
 .bc-slider-row.is-peak{background:var(--accent-l);margin:0 -16px;padding:6px 16px;border-radius:0}
 .bc-slider-row.is-peak .bc-wk{color:var(--accent);font-weight:500}
 .bc-slider-row.is-deload{opacity:.7}
@@ -107,7 +111,7 @@
 .checkpoint .cp-title{font-size:12px;font-weight:500;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}.checkpoint p{font-size:12px;color:var(--tx2);margin-bottom:4px}
 .ref-card{background:var(--bg2);border-radius:10px;padding:16px 20px;margin-bottom:12px}
 .ref-card .ref-author{font-weight:500;font-size:13px;color:var(--tx);margin-bottom:2px}.ref-card .ref-book{font-style:italic;font-size:12px;color:var(--tx3);margin-bottom:8px}.ref-card .ref-principles{font-size:12px;color:var(--tx2);line-height:1.6}
-@media(max-width:600px){.input-grid,.formula-grid{grid-template-columns:1fr}.results-grid{grid-template-columns:repeat(2,1fr)}.bc-slider-row{grid-template-columns:60px 1fr 50px 60px 60px;gap:4px}.hero h1{font-size:26px}.vol-wrap{height:180px}.donut-wrap{width:160px;height:160px}.week-table{display:block;overflow-x:auto}.block-config{margin:0 -1rem;border-radius:0;border-left:0;border-right:0}}
+@media(max-width:600px){.input-grid,.formula-grid{grid-template-columns:1fr}.results-grid{grid-template-columns:repeat(2,1fr)}.bc-slider-row{grid-template-columns:42px 1fr 44px 50px 72px 58px;gap:3px;font-size:11px}.bc-wk-dpct input[type=range]{width:36px}.hero h1{font-size:26px}.vol-wrap{height:180px}.donut-wrap{width:160px;height:160px}.week-table{display:block;overflow-x:auto}.block-config{margin:0 -1rem;border-radius:0;border-left:0;border-right:0}}
 </style>
 </head>
 <body>
@@ -219,16 +223,16 @@ const BK=[
  checks:['AeT re-test cải thiện','Endurance ≥2-3 điểm > Threshold','B2B hoàn thành']},
 {id:'b3',name:'Early Specific',label:'B3',ratio:.22,color:BC.b3,tc:BC.b3t,cls:'bh-spec',phase:'Specific',dpct:.45,
  focus:'Tempo A/B luân phiên, hill sustained 3-4×8-10\', long run HR-based 20-30% Z3, B2B weekly. Z4 finishing kick.',
- dist:[{w:25,c:'var(--accent-m)',l:'Z1'},{w:33,c:'var(--green)',l:'Z2'},{w:15,c:'#EF9F27',l:'Z3'},{w:10,c:'#c25a3a',l:'Hill'},{w:12,c:'var(--warn)',l:'Z4'},{w:5,c:'var(--purple)',l:'STR'}],
+ dist:[{w:28,c:'var(--accent-m)',l:'Z1'},{w:52,c:'var(--green)',l:'Z2'},{w:10,c:'#EF9F27',l:'Z3'},{w:6,c:'#c25a3a',l:'Hill'},{w:2,c:'var(--warn)',l:'Z4'},{w:2,c:'var(--purple)',l:'STR'}],
  defMult:[1.20,1.25,1.30,1.11],roles:['Re-entry','Build','Peak','Deload'],isPeak:[0,0,1,0],isDl:[0,0,0,1],
  lr:['4h','5h','5h','2h'],b2b:['1h30','2h','2h','—'],hill:["3×8'","3×10'","4×8'","3×6'"],str:['1×','1×','1×','1× (50%)'],it:['115','125','125','80'],tempo:["A:3×10'","B:35'","A:4×10'",'—'],z4:['FK+hill','FK+hill','FK+hill','—'],
  checks:['Tempo không drift Z4 sớm','Long run 20-30% Z3','B2B weekly OK']},
-{id:'b4',name:'Late Specific',label:'B4',ratio:.34,color:BC.b4,tc:BC.b4t,cls:'bh-spec2',phase:'Specific',dpct:.60,
- focus:'Race rehearsal 7-8h, peak B2B, V×1.35, uphill/downhill, chạy khi mệt. Step-back trước peak. Z4 ~18\'/wk.',
- dist:[{w:22,c:'var(--accent-m)',l:'Z1'},{w:30,c:'var(--green)',l:'Z2'},{w:18,c:'#EF9F27',l:'Z3'},{w:12,c:'#c25a3a',l:'Hill'},{w:14,c:'var(--warn)',l:'Z4'},{w:4,c:'var(--purple)',l:'STR'}],
- defMult:[1.20,1.30,1.10,1.35,1.25,1.20],roles:['Re-entry','Build','Step-back','Peak','Sustained','Sustained'],isPeak:[0,0,0,1,0,0],isDl:[0,0,2,0,0,0],
- lr:['4h','5h','3h','7-8h ★','5h','4h'],b2b:['2h','2h30','1h30','3h','2h','2h'],hill:["3×10'","3×12'","3×8'","2×15'","3×10'","3×8'"],str:['1×','1×','1×','1×(r)','1×','1×'],it:['115','125','100','130','120','115'],tempo:["B:30'","A:4×10'","B:25'",'A/B','A/B',"B:30'"],z4:['FK+hill','FK+hill','Reduced','Peak','FK+hill','FK+hill'],
- checks:['Race rehearsal 7-8h complete','Gear test OK','Peak B2B sustainable']},
+{id:'b4',name:'Late Specific',label:'B4',ratio:.34,color:BC.b4,tc:BC.b4t,cls:'bh-spec2',phase:'Specific',dpct:.55,
+ focus:'Race rehearsal 7-8h @ V×1.25 (D+ peak 75% race cap). Step-back trước + deload sau peak. 80/20 polarized, Z4 ~12-15\'/wk.',
+ dist:[{w:30,c:'var(--accent-m)',l:'Z1'},{w:50,c:'var(--green)',l:'Z2'},{w:10,c:'#EF9F27',l:'Z3'},{w:6,c:'#c25a3a',l:'Hill'},{w:3,c:'var(--warn)',l:'Z4'},{w:1,c:'var(--purple)',l:'STR'}],
+ defMult:[1.20,1.30,1.10,1.25,0.95,1.10],roles:['Re-entry','Build','Step-back','Peak','Deload','Re-build'],isPeak:[0,0,0,1,0,0],isDl:[0,0,2,0,1,0],
+ lr:['4h','5h','3h','7-8h ★','2h30','4h'],b2b:['2h','2h30','1h30','3h','—','2h'],hill:["3×10'","3×12'","3×8'","2×15'","3×6'","3×8'"],str:['1×','1×','1×','1×(r)','1×(50%)','1×'],it:['115','125','100','125','85','110'],tempo:["B:30'","A:4×10'","B:25'",'A/B','—',"B:25'"],z4:['FK+hill','FK+hill','Reduced','Peak','—','FK+hill'],
+ checks:['Race rehearsal 7-8h complete','Gear test OK','W5 deload absorption']},
 {id:'b5',name:'Taper & Race',label:'B5',ratio:null,color:BC.b5,tc:BC.b5t,cls:'bh-taper',phase:'Taper',fixed:3,dpct:.05,
  focus:'Taper 1: V×0.85, vẫn tempo ngắn + hill. Taper 2: V×0.60. Race week: V×0.35, travel, shakeout, RACE DAY.',
  dist:[{w:45,c:'var(--accent-m)',l:'Z1'},{w:33,c:'var(--green)',l:'Z2'},{w:10,c:'#EF9F27',l:'Z3'},{w:9,c:'var(--warn)',l:'Z4'},{w:3,c:'#c25a3a',l:'Hill'}],
@@ -237,7 +241,7 @@ const BK=[
  checks:['IT → Performance (50-79%)','Running Perf >100%','Race day ready']}
 ];
 
-let STATE={weekMults:[],weekData:[],bw:[],Va:70,raceDp:8800,dpcts:[],dirty:false};
+let STATE={weekMults:[],weekData:[],bw:[],Va:70,raceDp:8800,dpcts:[],weekDpcts:[],dirty:false};
 
 function addDays(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
 function fmtD(d){return d.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'});}
@@ -258,12 +262,18 @@ function buildDefaultMults(bw){
   return m;
 }
 
-function computeWeekData(Va,raceDp,bw,mults,dpcts){
+function buildDefaultWeekDpcts(bw,dpcts){
+  const wd=[];
+  BK.forEach((b,i)=>{const d=dpcts[i]||b.dpct;for(let w=0;w<bw[i];w++)wd.push(d);});
+  return wd;
+}
+
+function computeWeekData(Va,raceDp,bw,mults,weekDpcts){
   const wd=[];let wc=0;
   BK.forEach((b,bi)=>{
-    const dpct=dpcts[bi]||b.dpct;
     for(let wi=0;wi<bw[bi];wi++){
       const m=mults[wc]||0.35;
+      const dpct=weekDpcts[wc]!=null?weekDpcts[wc]:b.dpct;
       const km=Math.round(Va*m);
       const dp=Math.round(raceDp*dpct*m);
       const si=wi%b.roles.length;
@@ -296,17 +306,19 @@ function generate(){
 
   const Va=cross==='easyrun'?Math.round(V*.93):V;
   const bw=calcBlockWeeks(totalW);
-  let mults,dpcts;
+  let mults,dpcts,weekDpcts;
   if(STATE.dirty&&STATE.weekMults.length===totalW){
     mults=STATE.weekMults;
     dpcts=STATE.dpcts.length===BK.length?STATE.dpcts:BK.map(b=>b.dpct);
+    weekDpcts=STATE.weekDpcts.length===totalW?STATE.weekDpcts:buildDefaultWeekDpcts(bw,dpcts);
   }else{
     mults=buildDefaultMults(bw);
     dpcts=BK.map(b=>b.dpct);
+    weekDpcts=buildDefaultWeekDpcts(bw,dpcts);
   }
 
-  const wd=computeWeekData(Va,raceDp,bw,mults,dpcts);
-  STATE={weekMults:mults,weekData:wd,bw,Va,raceDp,dpcts,dirty:false};
+  const wd=computeWeekData(Va,raceDp,bw,mults,weekDpcts);
+  STATE={weekMults:mults,weekData:wd,bw,Va,raceDp,dpcts,weekDpcts,dirty:false};
   
   document.getElementById('btn-update').disabled=true;
   const badge=document.getElementById('changed-badge');if(badge)badge.style.display='none';
@@ -350,17 +362,19 @@ function buildConfig(wd,bw,Va,raceDp){
   BK.forEach((b,bi)=>{
     const dpct=STATE.dpcts[bi]||b.dpct;
     html+=`<div class="block-config"><div class="bc-header" style="background:${b.color};color:${b.tc}">${b.label} — ${b.name} <span class="bc-phase">${b.phase} · <span class="bc-dpct-wrap">D%<input type="range" min="5" max="80" step="5" value="${Math.round(dpct*100)}" data-bi="${bi}" oninput="onDpctSlider(this)" class="bc-dpct-slider"><span id="dpct-${bi}">${Math.round(dpct*100)}%</span></span></span></div><div class="bc-body">`;
-    html+=`<div class="bc-slider-row" style="border-bottom:1px solid var(--border);padding-bottom:4px;margin-bottom:4px"><span class="bc-wk" style="font-weight:500;color:var(--tx)">Tuần</span><span style="font-size:10px;color:var(--tx3)">Multiplier</span><span style="font-size:10px;color:var(--tx3);text-align:center">×</span><span style="font-size:10px;color:var(--tx3);text-align:right">Run</span><span style="font-size:10px;color:var(--tx3);text-align:right">D+</span></div>`;
+    html+=`<div class="bc-slider-row" style="border-bottom:1px solid var(--border);padding-bottom:4px;margin-bottom:4px"><span class="bc-wk" style="font-weight:500;color:var(--tx)">Tuần</span><span style="font-size:10px;color:var(--tx3)">Multiplier</span><span style="font-size:10px;color:var(--tx3);text-align:center">×</span><span style="font-size:10px;color:var(--tx3);text-align:right">Run</span><span style="font-size:10px;color:var(--tx3);text-align:right">D%</span><span style="font-size:10px;color:var(--tx3);text-align:right">D+</span></div>`;
     let bKm=0,bDp=0;
     for(let wi=0;wi<bw[bi];wi++){
       const w=wd[gi];const pk=w.isPeak;const dl=w.isDl;
       const cls=pk?'is-peak':dl?'is-deload':'';
-      const thumbColor=pk?BC.b1t:b.color;
+      const wdp=STATE.weekDpcts[gi]!=null?STATE.weekDpcts[gi]:b.dpct;
+      const wdpPct=Math.round(wdp*100);
       html+=`<div class="bc-slider-row ${cls}">
         <span class="bc-wk">W${w.week} ${pk?'★':''}</span>
         <input type="range" min="0.20" max="1.60" step="0.05" value="${w.mult.toFixed(2)}" data-idx="${gi}" oninput="onSlider(this)" style="accent-color:${b.color}">
         <span class="bc-mult" id="sm-${gi}">×${w.mult.toFixed(2)}</span>
         <span class="bc-km" id="sk-${gi}">${w.km} km</span>
+        <span class="bc-wk-dpct"><input type="range" min="5" max="80" step="5" value="${wdpPct}" data-idx="${gi}" oninput="onWeekDpctSlider(this)" style="accent-color:${b.color}"><span class="bc-wk-dp-val" id="sdp-${gi}">${wdpPct}%</span></span>
         <span class="bc-dp" id="sd-${gi}">${w.dp.toLocaleString()}</span>
       </div>`;
       bKm+=w.km;bDp+=w.dp;gi++;
@@ -375,8 +389,7 @@ function onSlider(el){
   const val=parseFloat(el.value);
   STATE.weekMults[idx]=val;
   const Va=STATE.Va,raceDp=STATE.raceDp;
-  const w=STATE.weekData[idx];
-  const dpct=STATE.dpcts[w.block];
+  const dpct=STATE.weekDpcts[idx]!=null?STATE.weekDpcts[idx]:BK[STATE.weekData[idx].block].dpct;
   const km=Math.round(Va*val);
   const dp=Math.round(raceDp*dpct*val);
   document.getElementById('sm-'+idx).textContent='×'+val.toFixed(2);
@@ -390,16 +403,32 @@ function onDpctSlider(el){
   const val=parseInt(el.value)/100;
   STATE.dpcts[bi]=val;
   document.getElementById('dpct-'+bi).textContent=Math.round(val*100)+'%';
-  // Update all D+ values for this block
+  // Block slider overrides all weeks in block
   const Va=STATE.Va,raceDp=STATE.raceDp;
   let gi=0;
   for(let i=0;i<bi;i++)gi+=STATE.bw[i];
   for(let wi=0;wi<STATE.bw[bi];wi++){
     const idx=gi+wi;
+    STATE.weekDpcts[idx]=val;
     const mult=STATE.weekMults[idx];
     const dp=Math.round(raceDp*val*mult);
     document.getElementById('sd-'+idx).textContent=dp.toLocaleString();
+    const wkVal=document.getElementById('sdp-'+idx);
+    if(wkVal)wkVal.textContent=Math.round(val*100)+'%';
+    const wkSlider=document.querySelector('.bc-wk-dpct input[data-idx="'+idx+'"]');
+    if(wkSlider)wkSlider.value=Math.round(val*100);
   }
+  markDirty();
+}
+
+function onWeekDpctSlider(el){
+  const idx=+el.dataset.idx;
+  const val=parseInt(el.value)/100;
+  STATE.weekDpcts[idx]=val;
+  const raceDp=STATE.raceDp,mult=STATE.weekMults[idx];
+  const dp=Math.round(raceDp*val*mult);
+  document.getElementById('sdp-'+idx).textContent=Math.round(val*100)+'%';
+  document.getElementById('sd-'+idx).textContent=dp.toLocaleString();
   markDirty();
 }
 
