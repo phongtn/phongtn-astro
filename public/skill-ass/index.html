@@ -118,6 +118,42 @@
 .skill-detail .sd-def{font-size:12px;color:var(--tx2);line-height:1.6;margin-bottom:8px}
 .skill-detail .sd-test{font-family:var(--mono);font-size:11px;color:var(--accent);background:var(--bg);padding:6px 10px;border-radius:5px;margin-top:4px}
 .divider{height:1px;background:var(--border);margin:2rem 0}
+/* References */
+.ref-list{margin-left:1.2rem;list-style:decimal}
+.ref-list li{font-size:12px;color:var(--tx2);line-height:1.65;margin-bottom:10px;padding-left:4px}
+.ref-list li strong{color:var(--tx);font-weight:500}
+.ref-list li em{color:var(--tx2);font-style:italic}
+.ref-list li a{color:var(--accent);text-decoration:none;font-family:var(--mono);font-size:11px;border-bottom:.5px dotted var(--accent-m)}
+.ref-list li a:hover{color:var(--accent-m);border-bottom-style:solid}
+.ref-tag{display:inline-block;background:var(--accent-l);color:var(--accent);font-size:10px;font-style:italic;padding:1px 8px;border-radius:10px;margin-left:6px;font-weight:500}
+/* Reference groups */
+.ref-group{margin-bottom:18px;border:.5px solid var(--border);border-radius:12px;background:var(--bg);overflow:hidden}
+.ref-group-title{font-family:var(--serif);font-size:16px;font-weight:500;color:var(--tx);padding:12px 18px 8px;letter-spacing:-.2px}
+.ref-footnote{background:var(--warn-l);border:.5px solid var(--warn);border-radius:10px;padding:12px 16px;margin-top:14px;font-size:12px;color:var(--tx2);line-height:1.65}
+.ref-footnote strong{color:var(--warn);font-weight:500}
+.ref-footnote em{font-style:italic}
+.ref-footnote a{color:var(--warn);font-family:var(--mono);font-size:11px;text-decoration:none;border-bottom:.5px dotted var(--warn)}
+.ref-footnote a:hover{border-bottom-style:solid}
+/* Pinned citation */
+.ref-pinned{background:var(--accent-l);border:.5px solid var(--accent-m);border-radius:10px;padding:12px 16px;margin:0 14px 10px;border-left:4px solid var(--accent-m)}
+.ref-pin-label{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.ref-pin-body{font-size:12px;color:var(--tx);line-height:1.6}
+.ref-pin-body strong{font-weight:500}
+.ref-pin-body em{font-style:italic;color:var(--tx2)}
+.ref-pin-body a{color:var(--accent);font-family:var(--mono);font-size:11px;text-decoration:none;border-bottom:.5px dotted var(--accent-m)}
+.ref-pin-body a:hover{border-bottom-style:solid}
+/* Collapsible references */
+.ref-details{background:var(--bg2);border-top:.5px solid var(--border)}
+.ref-details summary{padding:11px 18px;cursor:pointer;font-size:12px;font-weight:500;color:var(--tx2);display:flex;align-items:center;justify-content:space-between;list-style:none;user-select:none;transition:background .2s}
+.ref-details summary::-webkit-details-marker{display:none}
+.ref-details summary:hover{background:var(--bg3);color:var(--tx)}
+.ref-summary-text{display:flex;align-items:center;gap:8px}
+.ref-summary-text::before{content:'＋';font-family:var(--mono);font-size:14px;color:var(--accent);font-weight:400}
+.ref-details[open] .ref-summary-text::before{content:'−'}
+.ref-summary-arrow{font-size:10px;color:var(--tx3);transition:transform .25s}
+.ref-details[open] summary{border-bottom:.5px solid var(--border);background:var(--bg3)}
+.ref-details[open] .ref-summary-arrow{transform:rotate(180deg)}
+.ref-details>ol{padding:14px 18px 16px;margin-left:1.2rem}
 @media(max-width:760px){
   .radar-wrap{flex-direction:column;gap:18px}
   .radar-canvas-wrap{width:340px;height:340px}
@@ -182,6 +218,36 @@
 <div id="groups-container"></div>
 </div>
 
+<div class="section">
+<div class="section-label">Tổng kết</div>
+<h2>Test-day Evaluation Sheet</h2>
+<p>Form tự động cập nhật khi bạn chấm điểm. In ra để lưu hồ sơ hoặc gửi HLV.</p>
+<div class="eval-form">
+<div class="ef-row header">
+  <span class="ef-label">VĐV:</span><span class="ef-input" id="ef-name">—</span>
+  <span class="ef-label">Ngày:</span><span class="ef-input" id="ef-date">—</span>
+</div>
+<div class="ef-row header" style="grid-template-columns:auto 1fr">
+  <span class="ef-label">Race mục tiêu:</span><span class="ef-input" id="ef-race">—</span>
+</div>
+<div class="ef-row"><span class="ef-label">AeT (Aerobic Drift):</span><span class="ef-input"><span id="ef-aet">—</span> / 5</span><span class="ef-label">Drift đo (%):</span><span class="ef-input">__________</span></div>
+<div class="ef-row"><span class="ef-label">Vertical Speed:</span><span class="ef-input"><span id="ef-vert">—</span> / 5</span><span class="ef-label">m+/h ở AeT:</span><span class="ef-input">__________</span></div>
+<div class="ef-row"><span class="ef-label">Fat Oxidation:</span><span class="ef-input"><span id="ef-fat">—</span> / 5</span><span class="ef-label">Long run không bonk (h):</span><span class="ef-input">__________</span></div>
+<div class="ef-row"><span class="ef-label">Sức bền & Đổ dốc:</span><span class="ef-input"><span id="ef-musc">—</span> / 5</span><span class="ef-label">Recovery dốc 1000m (ngày):</span><span class="ef-input">__________</span></div>
+<div class="ef-row"><span class="ef-label">Dung nạp Carb:</span><span class="ef-input"><span id="ef-carb">—</span> / 5</span><span class="ef-label">g/h ổn định:</span><span class="ef-input">__________</span></div>
+<div class="ef-row"><span class="ef-label">Điện giải & Nước:</span><span class="ef-input"><span id="ef-hydra">—</span> / 5</span><span class="ef-label">Sweat rate (L/h):</span><span class="ef-input">__________</span></div>
+<div class="ef-row"><span class="ef-label">Kiểm soát RPE:</span><span class="ef-input"><span id="ef-rpe">—</span> / 5</span><span></span><span></span></div>
+<div class="ef-row"><span class="ef-label">Cognitive Appraisal:</span><span class="ef-input"><span id="ef-cog">—</span> / 5</span><span></span><span></span></div>
+<div class="ef-row"><span class="ef-label">Kỷ luật & Problem Solving:</span><span class="ef-input"><span id="ef-disc">—</span> / 5</span><span class="ef-label">% bài tập 8 tuần:</span><span class="ef-input">__________</span></div>
+<div class="ef-summary">
+<div>→ Mức trung bình: <strong id="ef-overall">—</strong></div>
+<div>→ Bottleneck (≤2): <strong id="ef-bottleneck">—</strong></div>
+<div>→ Block khởi điểm khuyến nghị: <strong id="ef-block">—</strong></div>
+<div style="display:flex;gap:8px;align-items:baseline">→ Ghi chú: <span style="flex:1;border-bottom:1px solid var(--tx3);min-height:18px"></span></div>
+</div>
+</div>
+</div>
+
 <div class="action-row">
 <button class="btn" onclick="resetAll()">Reset</button>
 <button class="btn" onclick="window.print()">In / PDF</button>
@@ -196,82 +262,133 @@
 <div class="section-label">Phần 01</div>
 <h2>Sweat Rate Test Protocol</h2>
 <div class="protocol-card">
-<h4>Công thức</h4>
-<span class="pc-formula">sweat_rate (L/h) = (weight_before − weight_after + fluid_intake) / hours</span>
-<h4 style="margin-top:14px">Quy trình (60 phút)</h4>
+<h4>Công thức gravimetric (gold standard)</h4>
+<span class="pc-formula">sweat_rate (L/h) = (W_before − W_after + fluid_intake − urine_loss) / hours</span>
+<p style="margin-top:8px;font-size:12px;color:var(--tx2)">Phương pháp được công nhận bởi <strong>ACSM Position Stand</strong> (Sawka 2007, <em>Med Sci Sports Exerc</em>) và <strong>NATA Position Statement</strong> (McDermott 2017). Lưu ý: <strong>phải trừ urine loss</strong> nếu có đi vệ sinh trong test — đây là sai sót thường gặp ở các protocol đơn giản.</p>
+<h4 style="margin-top:14px">Quy trình (60–90 phút, race-pace)</h4>
 <ol>
-<li>Cân nặng <strong>weight_before</strong> (kg, không mặc áo, đã đi vệ sinh).</li>
-<li>Chạy 60 phút ở pace race-effort. Ghi <strong>fluid_intake</strong> (L) đã uống.</li>
-<li>Lau khô mồ hôi, cân lại <strong>weight_after</strong> (cùng điều kiện).</li>
-<li>Áp dụng công thức trên.</li>
+<li>Đi vệ sinh trước, cân <strong>W_before</strong> (kg, người trần hoặc đồ lót khô; ghi rõ điều kiện để tái hiện lần sau).</li>
+<li>Chạy 60–90 phút ở cường độ race (RPE 5–7), tốt nhất trên địa hình tương tự race.</li>
+<li>Ghi <strong>fluid_intake</strong> (L). Nếu phải đi vệ sinh giữa chừng → đo <strong>urine_loss</strong> (cân cốc hoặc ước lượng ml).</li>
+<li>Lau khô mồ hôi (towel-dry kỹ), thay đồ khô, cân <strong>W_after</strong> cùng điều kiện cân ban đầu.</li>
+<li>Áp dụng công thức trên (1 kg weight loss ≈ 1 L mồ hôi).</li>
 </ol>
-<h4 style="margin-top:14px">Đồng bộ Nutrition Plan</h4>
+<h4 style="margin-top:14px">Lặp test ở nhiều điều kiện</h4>
+<p style="font-size:12px;color:var(--tx2)">Sweat rate biến thiên rất mạnh theo nhiệt độ + cường độ. Đo tối thiểu ở:</p>
 <ol>
-<li>Đo sweat rate ở 3 mức nhiệt độ: &lt;20°C, 20–28°C, &gt;28°C.</li>
-<li>Hydration race: bù <strong>70–80% sweat rate</strong> (tránh hyponatremia).</li>
-<li>Sodium: 300–700 mg/L tùy "salty sweater" (vết muối trắng trên áo = chỉ báo định tính).</li>
+<li><strong>3 mức nhiệt độ</strong>: &lt;20°C / 20–28°C / &gt;28°C.</li>
+<li><strong>Cường độ race-pace</strong> thực tế (không phải easy run).</li>
+<li><strong>Địa hình tương đồng race</strong> (trail có leo dốc — không chỉ đường phẳng).</li>
+</ol>
+<h4 style="margin-top:14px">Chiến lược Hydration trong race</h4>
+<p style="font-size:12px;color:var(--tx2)">Hai trường phái hiện đại — chọn theo cá nhân:</p>
+<ol>
+<li><strong>Drink to thirst (ad libitum)</strong> — IMMDA &amp; Hoffman 2018 khuyến nghị cho ultra. Tự nhiên đạt ~60–70% sweat rate, <strong>giảm rõ rệt nguy cơ hyponatremia</strong>.</li>
+<li><strong>Programmed hydration</strong> — bù 80–100% sweat rate. Phù hợp khi VĐV biết rõ sweat rate của mình + race nóng + cường độ cao.</li>
+<li><strong>⚠ Cảnh báo</strong>: bù &gt;100% sweat rate trong race dài có thể gây <strong>EAH (exercise-associated hyponatremia)</strong> — nguy hiểm tính mạng. KHÔNG uống "phòng xa".</li>
+</ol>
+<h4 style="margin-top:14px">Sweat Sodium</h4>
+<p style="font-size:12px;color:var(--tx2)">Sodium dao động <strong>200–1500 mg/L</strong> theo Baker 2017 review (<em>Temperature</em>, n=hàng nghìn VĐV). Cách ước lượng:</p>
+<ol>
+<li><strong>Lab sweat test</strong> (Precision Hydration, Levelen patch): chính xác nhất.</li>
+<li><strong>Race rehearsal</strong>: thử nhiều nồng độ điện giải trong long run, ghi chú cảm giác chuột rút/mệt.</li>
+<li><strong>Visual "vết muối trắng" trên áo</strong>: chỉ báo định tính <strong>kém tin cậy</strong> (Baker 2009, <em>J Appl Physiol</em>: correlation thấp với sodium thực tế). Chỉ dùng để biết "có khả năng salty sweater" → cần test sâu hơn để xác nhận.</li>
 </ol>
 </div>
 </div>
 
 <div class="section">
 <div class="section-label">Phần 02</div>
-<h2>Aerobic Drift Test (MAF 60′)</h2>
+<h2>Aerobic Drift Test (HR Drift / Pa:HR)</h2>
 <div class="protocol-card">
 <h4>Công thức Drift</h4>
 <span class="pc-formula">drift % = (HR_phút_30-60 − HR_phút_0-30) / HR_phút_0-30 × 100</span>
-<h4 style="margin-top:14px">Quy trình</h4>
+<p style="margin-top:10px;font-size:12px;color:var(--tx2)"><strong>Lưu ý:</strong> Test này <strong>không dùng công thức MAF (180 − tuổi)</strong> — đó là heuristic không có cơ sở khoa học vững. Bài test này là <strong>iterative</strong>: chính nó xác định AeT của bạn, không cần biết AeT trước.</p>
+<h4 style="margin-top:14px">Quy trình (lần 1)</h4>
 <ol>
-<li>Khởi động 10–15 phút easy.</li>
-<li>Chạy 60 phút ở pace ổn định, địa hình phẳng. HR mục tiêu = MAF (180 − tuổi).</li>
-<li>Ghi HR trung bình 0–30 phút và 30–60 phút.</li>
-<li>Drift &lt;5% = AeT đã được phát triển tốt.</li>
+<li>Khởi động 10–15 phút easy. Điều kiện ổn định: terrain phẳng, nhiệt độ &lt;25°C, đã ăn 2h trước, không cafe.</li>
+<li>Chạy 60 phút ở pace bạn cảm thấy "có thể nói chuyện được" — RPE 4–5/10. Giữ pace ổn định, không đua tim.</li>
+<li>Ghi HR trung bình nửa đầu (0–30′) và nửa sau (30–60′).</li>
+<li>Tính drift theo công thức trên.</li>
 </ol>
+<h4 style="margin-top:14px">Đọc kết quả</h4>
+<ol>
+<li><strong>Drift &lt;5%</strong> → pace/HR đó ở hoặc dưới AeT. Lần sau thử pace cao hơn ~10–15s/km.</li>
+<li><strong>Drift 5–10%</strong> → pace đó ngay trên AeT. Lần sau thử pace thấp hơn ~5–10s/km.</li>
+<li><strong>Drift &gt;10%</strong> → pace cao hơn AeT khá nhiều. Lần sau giảm pace ~15–20s/km.</li>
+<li>Lặp 2–4 buổi (cách nhau 5–7 ngày) → hội tụ về pace/HR mà drift dao động 3–5% → đó là <strong>AeT của bạn</strong>.</li>
+</ol>
+<h4 style="margin-top:14px">Phương pháp thay thế</h4>
+<p style="font-size:12px;color:var(--tx2)">Nếu có HRV chest strap (Polar H10, Garmin HRM-Pro), có thể dùng <strong>DFA-alpha1</strong> qua app Kubios/Runalyze: ngưỡng α1 = 0.75 tương ứng AeT, α1 = 0.5 tương ứng AnT. Đây là phương pháp hiện đại, không cần test 60′.</p>
 </div>
 </div>
 
 <div class="section">
 <div class="section-label">Phần 03</div>
-<h2>Test-day Evaluation Sheet</h2>
-<p>Form đánh giá nhanh — dùng để in hoặc điền tay khi VĐV không dùng app.</p>
-<div class="eval-form">
-<div class="ef-row header"><span>VĐV:</span><span class="ef-input"></span><span>Ngày:</span><span class="ef-input"></span></div>
-<div class="ef-row"><span class="ef-label">AeT (Aerobic Drift):</span><span class="ef-input">___ / 5</span><span class="ef-label">Drift đo:</span><span class="ef-input">___ %</span></div>
-<div class="ef-row"><span class="ef-label">Vertical Speed:</span><span class="ef-input">___ / 5</span><span class="ef-label">m+/h ở AeT:</span><span class="ef-input">___</span></div>
-<div class="ef-row"><span class="ef-label">Fat Oxidation:</span><span class="ef-input">___ / 5</span><span class="ef-label">Long run không bonk:</span><span class="ef-input">___ h</span></div>
-<div class="ef-row"><span class="ef-label">Sức bền & Đổ dốc:</span><span class="ef-input">___ / 5</span><span class="ef-label">Recovery dốc 1000m:</span><span class="ef-input">___ ngày</span></div>
-<div class="ef-row"><span class="ef-label">Dung nạp Carb:</span><span class="ef-input">___ / 5</span><span class="ef-label">g/h ổn định:</span><span class="ef-input">___</span></div>
-<div class="ef-row"><span class="ef-label">Điện giải & Nước:</span><span class="ef-input">___ / 5</span><span class="ef-label">Sweat rate:</span><span class="ef-input">___ L/h</span></div>
-<div class="ef-row"><span class="ef-label">Kiểm soát RPE:</span><span class="ef-input">___ / 5</span><span></span><span></span></div>
-<div class="ef-row"><span class="ef-label">Cognitive Appraisal:</span><span class="ef-input">___ / 5</span><span></span><span></span></div>
-<div class="ef-row"><span class="ef-label">Kỷ luật & Problem Solving:</span><span class="ef-input">___ / 5</span><span class="ef-label">% bài tập 8 tuần:</span><span class="ef-input">___</span></div>
-<div class="ef-summary">
-<div>→ Mức trung bình: ___________</div>
-<div>→ Bottleneck (≤2): ___________________________________</div>
-<div>→ Block khởi điểm khuyến nghị: B___</div>
-<div>→ Ghi chú: ___________________________________________</div>
-</div>
-</div>
-</div>
-
-<div class="section">
-<div class="section-label">Phần 04</div>
 <h2>Định nghĩa chi tiết kỹ năng</h2>
 <p>Phần này giải thích đầy đủ từng kỹ năng để VĐV hiểu rõ trước khi tự chấm điểm.</p>
 <div id="skill-details"></div>
 </div>
 
 <div class="section">
-<div class="section-label">Phần 05</div>
+<div class="section-label">Phần 04</div>
 <h2>Hướng dẫn sử dụng</h2>
 <ol style="margin-left:1.2rem">
-<li><strong>Test-day trước, chấm điểm sau.</strong> Thực hiện các test (MAF, sweat rate, long run đánh giá) → có số liệu thực → mới chấm.</li>
+<li><strong>Test-day trước, chấm điểm sau.</strong> Thực hiện các test (HR drift, sweat rate, long run đánh giá) → có số liệu thực → mới chấm.</li>
 <li><strong>Trung thực với điểm số.</strong> Đánh giá quá cao = chọn block sai = chấn thương / DNF.</li>
 <li><strong>Bottleneck quyết định.</strong> Tiêu chí thấp nhất là điểm cần ưu tiên cải thiện, không phải tiêu chí mạnh nhất.</li>
 <li><strong>Đánh giá lại mỗi 4–6 tuần.</strong> Cuối mỗi block hoặc deload week. Mỗi block mục tiêu tăng ≥1 mức ở 1–2 tiêu chí ưu tiên.</li>
 <li><strong>Mức 5 (Elite)</strong> chỉ xác nhận qua kết quả thi đấu thực tế ở giải có tính cạnh tranh cao, không qua self-test.</li>
 <li><strong>Phát hiện bất thường khi test</strong> (đau bất thường, tim đập rối loạn) → dừng và tham khảo bác sĩ chuyên khoa.</li>
 </ol>
+</div>
+
+<div class="section">
+<div class="section-label">Phần 05</div>
+<h2>References</h2>
+<p>Mỗi nhóm hiển thị citation chính (gold standard) mặc định. Click vào tiêu đề "Xem N nghiên cứu khác" để mở rộng.</p>
+
+<div class="ref-group">
+<div class="ref-group-title">Citation — Sweat Rate Test Protocol</div>
+<div class="ref-pinned">
+<div class="ref-pin-label">Citation chính</div>
+<div class="ref-pin-body"><strong>Sawka MN, et al.</strong> American College of Sports Medicine position stand. Exercise and fluid replacement. <em>Med Sci Sports Exerc.</em> 2007;39(2):377-390. <a href="https://doi.org/10.1249/mss.0b013e31802ca597" target="_blank" rel="noopener">doi:10.1249/mss.0b013e31802ca597</a> <span class="ref-tag">Gold standard cho gravimetric method</span></div>
+</div>
+<details class="ref-details">
+<summary><span class="ref-summary-text">Xem thêm...</span><span class="ref-summary-arrow">▼</span></summary>
+<ol class="ref-list">
+<li><strong>McDermott BP, Anderson SA, Armstrong LE, et al.</strong> National Athletic Trainers' Association Position Statement: Fluid Replacement for the Physically Active. <em>J Athl Train.</em> 2017;52(9):877-895. <a href="https://doi.org/10.4085/1062-6050-52.9.02" target="_blank" rel="noopener">doi:10.4085/1062-6050-52.9.02</a> <span class="ref-tag">Yêu cầu hiệu chỉnh urine loss</span></li>
+<li><strong>Baker LB.</strong> Sweating Rate and Sweat Sodium Concentration in Athletes: A Review of Methodology and Intra/Interindividual Variability. <em>Sports Med.</em> 2017;47(Suppl 1):111-128. <a href="https://doi.org/10.1007/s40279-017-0691-5" target="_blank" rel="noopener">doi:10.1007/s40279-017-0691-5</a> <span class="ref-tag">Sodium range 200–1500 mg/L (n=hàng nghìn VĐV)</span></li>
+<li><strong>Baker LB, Stofan JR, Hamilton AA, Horswill CA.</strong> Comparison of regional patch collection vs. whole body washdown for measuring sweat sodium and potassium loss during exercise. <em>J Appl Physiol.</em> 2009;107(3):887-895. <a href="https://doi.org/10.1152/japplphysiol.00197.2009" target="_blank" rel="noopener">doi:10.1152/japplphysiol.00197.2009</a> <span class="ref-tag">Vết muối visual correlation kém với sodium thực tế</span></li>
+<li><strong>Hoffman MD, Cotter JD, Goulet ÉD, Laursen PB.</strong> View of dehydration and sport performance. <em>Br J Sports Med.</em> 2018;52(20):1338-1339. <a href="https://doi.org/10.1136/bjsports-2017-098644" target="_blank" rel="noopener">doi:10.1136/bjsports-2017-098644</a> <span class="ref-tag">Drink-to-thirst trong ultra</span></li>
+<li><strong>Hoffman MD, Stuempfle KJ.</strong> Hydration strategies, weight change and performance in a 161 km ultramarathon. <em>Res Sports Med.</em> 2014;22(3):213-225. <a href="https://doi.org/10.1080/15438627.2014.915838" target="_blank" rel="noopener">doi:10.1080/15438627.2014.915838</a> <span class="ref-tag">Field data Western States 100</span></li>
+<li><strong>Hew-Butler T, Rosner MH, Fowkes-Godek S, et al.</strong> Statement of the Third International Exercise-Associated Hyponatremia Consensus Development Conference. <em>Clin J Sport Med.</em> 2015;25(4):303-320. <a href="https://doi.org/10.1097/JSM.0000000000000221" target="_blank" rel="noopener">doi:10.1097/JSM.0000000000000221</a> <span class="ref-tag">Cảnh báo EAH (hyponatremia)</span></li>
+<li><strong>IMMDA Advisory Statement on Guidelines for Fluid Replacement During Marathon Running.</strong> International Marathon Medical Directors Association. <a href="https://immda.us/recommendations/" target="_blank" rel="noopener">immda.us/recommendations</a> <span class="ref-tag">Drink-to-thirst chính thức</span></li>
+</ol>
+</details>
+</div>
+
+<div class="ref-group">
+<div class="ref-group-title">Citation — Aerobic Drift Test (HR Drift / Pa:HR)</div>
+<div class="ref-pinned">
+<div class="ref-pin-label">Citation chính</div>
+<div class="ref-pin-body"><strong>Rogers B, Giles D, Draper N, Hoos O, Gronwald T.</strong> A New Detection Method Defining the Aerobic Threshold for Endurance Exercise and Training Prescription Based on Fractal Correlation Properties of Heart Rate Variability. <em>Front Physiol.</em> 2021;11:596567. <a href="https://doi.org/10.3389/fphys.2020.596567" target="_blank" rel="noopener">doi:10.3389/fphys.2020.596567</a> <span class="ref-tag">DFA-α1 = 0.75 ↔ AeT (validated)</span></div>
+</div>
+<details class="ref-details">
+<summary><span class="ref-summary-text">Xem thêm...</span><span class="ref-summary-arrow">▼</span></summary>
+<ol class="ref-list">
+<li><strong>Lamberts RP, Lemmink KAPM, Durandt JJ, Lambert MI.</strong> Variation in heart rate during submaximal exercise: implications for monitoring training. <em>J Strength Cond Res.</em> 2004;18(3):641-645. <a href="https://doi.org/10.1519/13733.1" target="_blank" rel="noopener">doi:10.1519/13733.1</a> <span class="ref-tag">HR drift là biomarker đáng tin cậy</span></li>
+<li><strong>Seiler S.</strong> What is best practice for training intensity and duration distribution in endurance athletes? <em>Int J Sports Physiol Perform.</em> 2010;5(3):276-291. <a href="https://doi.org/10.1123/ijspp.5.3.276" target="_blank" rel="noopener">doi:10.1123/ijspp.5.3.276</a> <span class="ref-tag">Polarized training & AeT zone</span></li>
+<li><strong>Maunder E, Seiler S, Mildenhall MJ, Kilding AE, Plews DJ.</strong> The Importance of 'Durability' in the Physiological Profiling of Endurance Athletes. <em>Sports Med.</em> 2021;51(8):1619-1628. <a href="https://doi.org/10.1007/s40279-021-01459-0" target="_blank" rel="noopener">doi:10.1007/s40279-021-01459-0</a> <span class="ref-tag">Cardiac drift = chỉ số durability</span></li>
+<li><strong>Vesterinen V, Nummela A, Heikura I, et al.</strong> Individual Endurance Training Prescription with Heart Rate Variability. <em>Med Sci Sports Exerc.</em> 2016;48(7):1347-1354. <a href="https://doi.org/10.1249/MSS.0000000000000910" target="_blank" rel="noopener">doi:10.1249/MSS.0000000000000910</a> <span class="ref-tag">HRV-guided training validation</span></li>
+<li><strong>Rogers B, Giles D, Draper N, Mourot L, Gronwald T.</strong> Detection of the Anaerobic Threshold in Endurance Sport Athletes Using a Non-Invasive Field Test Based on Fractal Correlation Properties of Heart Rate Variability. <em>Sports.</em> 2021;9(7):95. <a href="https://doi.org/10.3390/sports9070095" target="_blank" rel="noopener">doi:10.3390/sports9070095</a> <span class="ref-tag">DFA-α1 = 0.5 ↔ AnT</span></li>
+<li><strong>Gronwald T, Rogers B, Hoos O.</strong> Fractal Correlation Properties of Heart Rate Variability: A New Biomarker for Intensity Distribution in Endurance Exercise and Training Prescription? <em>Front Physiol.</em> 2020;11:550572. <a href="https://doi.org/10.3389/fphys.2020.550572" target="_blank" rel="noopener">doi:10.3389/fphys.2020.550572</a> <span class="ref-tag">Tổng quan DFA-α1</span></li>
+<li><strong>Johnston S, House S, Jornet K.</strong> <em>Training for the Uphill Athlete.</em> Patagonia Books; 2019. <span class="ref-tag">Sách thực hành — drift test protocol</span></li>
+</ol>
+</details>
+</div>
+
+
 </div>
 
 </div><!-- /panel-testday -->
@@ -284,7 +401,7 @@ const GROUPS=[
  skills:[
   {id:'aet',name:'Ngưỡng Hiếu khí (AeT)',
    desc:'Khả năng duy trì vận tốc cao nhất khi nồng độ lactate <2 mmol/L. Đo bằng Aerobic Drift trong MAF test.',
-   test:'MAF test 60′: drift = (HR_30-60′ − HR_0-30′) / HR_0-30′ × 100%',
+   test:'HR Drift test 60′ iterative: drift = (HR_30-60′ − HR_0-30′) / HR_0-30′ × 100%. Lặp 2-4 buổi để tìm pace/HR có drift 3-5% — đó là AeT.',
    levels:[
     {n:1,lbl:'Deficient',d:'Drift >15%, thở dốc ở pace chậm, không thể nói chuyện'},
     {n:2,lbl:'Aware',d:'Drift 10–15%, biết chạy chậm nhưng thường vượt vùng xám'},
@@ -383,9 +500,13 @@ function init(){
   buildSkillDetails();
   bindTabs();
   loadFromStorage();
+  ['in-name','in-date','in-race'].forEach(id=>{
+    document.getElementById(id).addEventListener('input',()=>{saveToStorage();updateEvalForm();});
+  });
   drawRadar();
   updateStats();
   updateBlockRec();
+  updateEvalForm();
 }
 
 function bindTabs(){
@@ -465,6 +586,39 @@ function onScoreChange(el){
   drawRadar();
   updateStats();
   updateBlockRec();
+  updateEvalForm();
+}
+
+function updateEvalForm(){
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v||'—';};
+  set('ef-name',document.getElementById('in-name').value.trim());
+  const d=document.getElementById('in-date').value;
+  if(d){const dt=new Date(d);set('ef-date',dt.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'}));}else set('ef-date','');
+  set('ef-race',document.getElementById('in-race').value.trim());
+  // Skill scores
+  const map={'phys.aet':'ef-aet','phys.vert':'ef-vert','phys.fat':'ef-fat','physic.musc':'ef-musc','nut.carb':'ef-carb','nut.hydra':'ef-hydra','psyc.rpe':'ef-rpe','psyc.cog':'ef-cog','psyc.disc':'ef-disc'};
+  Object.entries(map).forEach(([k,id])=>{
+    const [gid,sid]=k.split('.');
+    const v=SCORES[gid]?.[sid];
+    set(id,v?v.toString():'—');
+  });
+  // Summary
+  const ov=overallAvg();
+  set('ef-overall',ov!==null?ov.toFixed(2)+' / 5':'—');
+  // Bottleneck
+  let bnSkill=null,bnVal=99;
+  GROUPS.forEach(g=>{
+    Object.entries(SCORES[g.id]||{}).forEach(([sid,v])=>{
+      if(v<=2&&v<bnVal){bnVal=v;bnSkill=g.skills.find(x=>x.id===sid)?.name;}
+    });
+  });
+  set('ef-bottleneck',bnSkill?`${bnSkill} (mức ${bnVal})`:'Không có');
+  // Block rec
+  const allFilled=GROUPS.every(g=>Object.keys(SCORES[g.id]||{}).length===g.skills.length);
+  if(allFilled){
+    const blockEl=document.getElementById('br-block');
+    set('ef-block',blockEl?blockEl.textContent:'—');
+  }else set('ef-block','—');
 }
 
 function groupAvg(gid){
@@ -707,14 +861,8 @@ function resetAll(){
   if(!confirm('Xóa toàn bộ điểm số đã chấm?'))return;
   SCORES={};
   document.querySelectorAll('.score-select').forEach(s=>{s.value='';s.classList.remove('scored');});
-  saveToStorage();drawRadar();updateStats();updateBlockRec();
+  saveToStorage();drawRadar();updateStats();updateBlockRec();updateEvalForm();
 }
-
-['in-name','in-date','in-race'].forEach(id=>{
-  document.addEventListener('DOMContentLoaded',()=>{
-    document.getElementById(id)?.addEventListener('input',saveToStorage);
-  });
-});
 
 window.addEventListener('resize',drawRadar);
 document.addEventListener('DOMContentLoaded',init);
