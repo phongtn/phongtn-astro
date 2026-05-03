@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skills Assessment — Trail Ultra Runner</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#faf9f6;--bg2:#f2f0ec;--bg3:#e8e6e1;--tx:#1c1b18;--tx2:#5a5955;--tx3:#8c8b86;--border:rgba(0,0,0,0.09);--accent:#1a5c54;--accent-l:#e8f5f2;--accent-m:#3b9b8f;--warn:#7a4b14;--warn-l:#faf0e0;--danger:#7a3520;--danger-l:#faeae5;--info:#14456e;--info-l:#e6f0fa;--purple:#4a3578;--purple-l:#f0ecfa;--green:#2d5a25;--green-l:#eaf3e8;--serif:'Lora',Georgia,serif;--sans:'DM Sans',-apple-system,sans-serif;--mono:'DM Mono','SF Mono',monospace}
+@media(prefers-color-scheme:dark){:root{--bg:#141310;--bg2:#1e1d1a;--bg3:#2a2926;--tx:#e4e2dc;--tx2:#a8a7a2;--tx3:#6e6d69;--border:rgba(255,255,255,0.08);--accent:#7ed4c8;--accent-l:#1a3330;--accent-m:#5dcaa5;--warn:#e8b06a;--warn-l:#332a18;--danger:#e89878;--danger-l:#33201a;--info:#7ab8f0;--info-l:#162840;--purple:#b8a0e8;--purple-l:#28203f;--green:#8ecf7a;--green-l:#1e3119}}
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:var(--sans);background:var(--bg);color:var(--tx);line-height:1.7;font-size:14px}
+.page{max-width:820px;margin:0 auto;padding:3rem 1.5rem 4rem}
+.hero{text-align:center;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+.hero-label{font-family:var(--mono);font-size:11px;font-weight:300;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.hero h1{font-family:var(--serif);font-size:34px;font-weight:400;letter-spacing:-.5px;line-height:1.2;margin-bottom:8px}
+.hero .sub{font-size:14px;color:var(--tx2);max-width:560px;margin:0 auto}
+/* Tabs */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:2rem}
+.tab{flex:1;padding:14px 18px;background:none;border:none;border-bottom:2px solid transparent;font-family:var(--sans);font-size:13px;font-weight:500;color:var(--tx3);cursor:pointer;letter-spacing:.3px;transition:all .2s}
+.tab:hover{color:var(--tx2)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+/* Athlete bar */
+.athlete-bar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:1.5rem}
+.athlete-bar .input-group{background:var(--bg2);border-radius:10px;padding:10px 14px}
+.athlete-bar label{display:block;font-size:10px;font-weight:500;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.athlete-bar input{width:100%;background:var(--bg);border:.5px solid var(--border);border-radius:6px;padding:6px 10px;font-family:var(--mono);font-size:13px;color:var(--tx);outline:none}
+.athlete-bar input:focus{border-color:var(--accent-m)}
+/* Section */
+.section{margin-bottom:2.5rem}
+.section-label{font-family:var(--mono);font-size:10px;font-weight:300;letter-spacing:2px;text-transform:uppercase;color:var(--tx3);margin-bottom:6px}
+.section h2{font-family:var(--serif);font-size:24px;font-weight:400;margin-bottom:10px;letter-spacing:-.3px}
+.section h3{font-family:var(--serif);font-size:18px;font-weight:400;margin:24px 0 10px;letter-spacing:-.2px}
+.section p,.section li{font-size:13px;color:var(--tx2);margin-bottom:8px}
+/* Radar */
+.radar-wrap{background:linear-gradient(135deg,var(--bg2) 0%,var(--bg3) 100%);border-radius:16px;padding:24px;margin-bottom:1.5rem;display:flex;align-items:center;gap:28px;position:relative;overflow:hidden}
+.radar-wrap::before{content:'';position:absolute;top:-40%;right:-20%;width:60%;height:160%;background:radial-gradient(circle,rgba(59,155,143,.12) 0%,transparent 70%);pointer-events:none}
+.radar-wrap::after{content:'';position:absolute;bottom:-30%;left:-15%;width:50%;height:130%;background:radial-gradient(circle,rgba(74,53,120,.08) 0%,transparent 70%);pointer-events:none}
+.radar-canvas-wrap{position:relative;width:420px;height:420px;flex-shrink:0;z-index:1}
+.radar-canvas-wrap canvas{display:block}
+.radar-stats{flex:1;display:flex;flex-direction:column;gap:10px;z-index:1}
+.radar-stat{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg);border-radius:10px;border-left:4px solid var(--tx3);box-shadow:0 1px 3px rgba(0,0,0,.04);transition:all .25s}
+.radar-stat.has-score{border-left-width:4px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.radar-stat.has-score:hover{transform:translateX(2px)}
+.radar-stat .rs-name{font-size:13px;font-weight:500;color:var(--tx);flex:1}
+.radar-stat .rs-val{font-family:var(--mono);font-size:22px;font-weight:500;color:var(--accent);min-width:48px;text-align:right}
+.radar-stat.is-low .rs-val{color:var(--danger)}
+.radar-stat.is-mid .rs-val{color:var(--warn)}
+.radar-stat .rs-bar{height:6px;background:var(--bg3);border-radius:3px;flex:1;overflow:hidden;max-width:120px;position:relative}
+.radar-stat .rs-bar-fill{height:100%;border-radius:3px;transition:width .5s cubic-bezier(.4,0,.2,1);position:relative}
+.radar-stat .rs-bar-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);animation:shimmer 2.5s infinite}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.radar-empty{text-align:center;color:var(--tx3);font-size:12px;font-style:italic;padding:24px}
+/* Group accordion */
+.group-card{border:.5px solid var(--border);border-radius:14px;margin-bottom:14px;background:var(--bg);transition:box-shadow .2s,transform .2s;border-left:4px solid var(--gh-color,var(--tx3))}
+.group-card:hover{box-shadow:0 4px 14px rgba(0,0,0,.06)}
+.group-header{padding:14px 18px;background:linear-gradient(90deg,var(--gh-color-l,var(--bg2)) 0%,var(--bg2) 60%);display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none;transition:background .2s;border-radius:10px 10px 0 0}
+.group-card:not(.open) .group-header{border-radius:10px}
+.group-header:hover{filter:brightness(.97)}
+.group-header .gh-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 3px var(--bg),0 0 0 4px var(--gh-color,var(--tx3))}
+.group-header .gh-name{flex:1;font-size:14px;font-weight:500;color:var(--tx)}
+.group-header .gh-name .gh-en{font-family:var(--mono);font-size:10px;color:var(--tx3);font-weight:400;margin-left:6px;text-transform:uppercase;letter-spacing:.5px}
+.group-header .gh-avg{font-family:var(--mono);font-size:15px;font-weight:500;color:var(--gh-color,var(--accent));min-width:60px;text-align:right;background:var(--bg);padding:3px 10px;border-radius:12px;border:.5px solid var(--border)}
+.group-header .gh-avg.empty{color:var(--tx3);background:transparent;border-color:transparent}
+.group-header .gh-arrow{font-size:11px;color:var(--tx3);transition:transform .2s;width:14px;text-align:center}
+.group-card.open .gh-arrow{transform:rotate(90deg)}
+.group-body{display:none;padding:8px 18px 16px}
+.group-card.open .group-body{display:block}
+/* Skill row */
+.skill-row{padding:14px 0;border-bottom:.5px solid var(--border)}
+.skill-row:last-child{border-bottom:none}
+.skill-head{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.skill-name{flex:1;font-size:13px;font-weight:500;color:var(--tx)}
+.skill-desc{font-size:12px;color:var(--tx3);line-height:1.55;margin-bottom:8px}
+.score-wrap{position:relative}
+.score-select{font-family:var(--mono);font-size:13px;padding:6px 28px 6px 10px;background:var(--bg);border:.5px solid var(--border);border-radius:6px;color:var(--tx);cursor:pointer;outline:none;-webkit-appearance:none;appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--tx3) 50%),linear-gradient(135deg,var(--tx3) 50%,transparent 50%);background-position:calc(100% - 14px) 50%,calc(100% - 9px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;min-width:80px}
+.score-select:focus{border-color:var(--accent-m)}
+.score-select.scored{background-color:var(--accent-l);border-color:var(--accent-m);color:var(--accent);font-weight:500}
+.score-wrap{position:relative}
+.score-popup{position:absolute;bottom:calc(100% + 8px);right:0;background:var(--bg);border:.5px solid var(--border);border-radius:10px;padding:10px;min-width:300px;max-width:340px;box-shadow:0 -4px 20px rgba(0,0,0,.14);z-index:1000;display:none;font-size:11px}
+.score-popup::after{content:'';position:absolute;top:100%;right:24px;border:6px solid transparent;border-top-color:var(--border)}
+.score-wrap:hover .score-popup,.score-wrap:focus-within .score-popup{display:block}
+.score-popup .sp-row{display:flex;gap:8px;padding:5px 0;border-bottom:.5px dashed var(--border)}
+.score-popup .sp-row:last-child{border-bottom:none}
+.score-popup .sp-n{font-family:var(--mono);font-weight:500;color:var(--accent);min-width:18px}
+.score-popup .sp-lbl{font-weight:500;color:var(--tx);min-width:80px;font-size:10px;text-transform:uppercase;letter-spacing:.4px}
+.score-popup .sp-desc{flex:1;color:var(--tx2);line-height:1.5}
+/* Block recommendation */
+.block-rec{background:var(--accent-l);border:.5px solid var(--accent-m);border-radius:12px;padding:18px 22px;margin-top:1.5rem;display:none}
+.block-rec.show{display:block}
+.block-rec .br-label{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.block-rec h3{font-family:var(--serif);font-size:20px;font-weight:400;color:var(--accent);margin-bottom:6px}
+.block-rec p{font-size:13px;color:var(--tx);margin-bottom:8px}
+.block-rec .br-bottleneck{font-size:12px;color:var(--warn);font-weight:500;background:var(--warn-l);padding:6px 10px;border-radius:6px;display:inline-block;margin-top:6px}
+/* Action row */
+.action-row{display:flex;gap:10px;margin-top:1.5rem;flex-wrap:wrap}
+.btn{padding:10px 20px;font-family:var(--sans);font-size:13px;font-weight:500;border-radius:8px;border:.5px solid var(--border);background:var(--bg2);color:var(--tx);cursor:pointer;letter-spacing:.3px;transition:all .2s}
+.btn:hover{background:var(--bg3)}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary:hover{opacity:.85;background:var(--accent)}
+/* Tab 2 */
+.protocol-card{background:var(--bg2);border-radius:12px;padding:18px 22px;margin-bottom:14px;border-left:3px solid var(--accent-m)}
+.protocol-card h4{font-family:var(--serif);font-size:16px;font-weight:500;margin-bottom:6px}
+.protocol-card .pc-formula{font-family:var(--mono);font-size:12px;color:var(--accent);background:var(--bg);padding:8px 12px;border-radius:6px;margin:8px 0;display:block;white-space:pre-wrap}
+.protocol-card ol{margin-left:1.2rem;margin-top:6px}
+.protocol-card ol li{font-size:13px;color:var(--tx2);margin-bottom:4px}
+/* Eval sheet (printable form) */
+.eval-form{background:var(--bg2);border-radius:12px;padding:24px;margin:1rem 0;font-family:var(--mono);font-size:12px;line-height:2}
+.eval-form .ef-row{display:grid;grid-template-columns:auto 1fr auto 1fr;gap:8px;align-items:baseline;padding:4px 0;border-bottom:.5px dashed var(--border)}
+.eval-form .ef-row.header{border-bottom:1px solid var(--border);font-weight:500;color:var(--tx)}
+.eval-form .ef-label{color:var(--tx2)}
+.eval-form .ef-input{border-bottom:1px solid var(--tx3);min-height:18px}
+.eval-form .ef-summary{margin-top:14px;padding-top:14px;border-top:1px solid var(--border);display:grid;gap:6px}
+/* Skill detail tab2 */
+.skill-detail{background:var(--bg2);border-radius:10px;padding:14px 18px;margin-bottom:10px}
+.skill-detail h5{font-size:13px;font-weight:500;color:var(--tx);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.skill-detail h5 .sd-dot{width:8px;height:8px;border-radius:50%}
+.skill-detail .sd-def{font-size:12px;color:var(--tx2);line-height:1.6;margin-bottom:8px}
+.skill-detail .sd-test{font-family:var(--mono);font-size:11px;color:var(--accent);background:var(--bg);padding:6px 10px;border-radius:5px;margin-top:4px}
+.divider{height:1px;background:var(--border);margin:2rem 0}
+@media(max-width:760px){
+  .radar-wrap{flex-direction:column;gap:18px}
+  .radar-canvas-wrap{width:340px;height:340px}
+  .radar-stats{width:100%}
+}
+@media(max-width:600px){
+  .athlete-bar{grid-template-columns:1fr}
+  .radar-canvas-wrap{width:300px;height:300px}
+  .hero h1{font-size:26px}
+  .score-popup{right:auto;left:0;min-width:240px}
+  .skill-head{flex-wrap:wrap}
+  .eval-form .ef-row{grid-template-columns:1fr 1fr}
+}
+@media print{
+  .tabs,.action-row,.score-popup,.athlete-bar input{display:none!important}
+  body{background:#fff;color:#000}
+  .group-body{display:block!important}
+}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="hero">
+<div class="hero-label">Skills Assessment</div>
+<h1>Đánh giá kỹ năng VĐV Ultra Trail</h1>
+<div class="sub">Bộ đánh giá tự thực hiện 9 kỹ năng cốt lõi. Xác định bottleneck → block khởi điểm phù hợp.</div>
+</div>
+
+<div class="tabs">
+<button class="tab active" data-tab="assess">Đánh giá kỹ năng</button>
+<button class="tab" data-tab="testday">Test-day & Định nghĩa</button>
+</div>
+
+<!-- TAB 1: ASSESSMENT -->
+<div class="tab-panel active" id="panel-assess">
+
+<div class="athlete-bar">
+<div class="input-group"><label>VĐV</label><input type="text" id="in-name" placeholder="Tên VĐV"></div>
+<div class="input-group"><label>Ngày đánh giá</label><input type="date" id="in-date"></div>
+<div class="input-group"><label>Race mục tiêu</label><input type="text" id="in-race" placeholder="VMM 100mi 2026"></div>
+</div>
+
+<div class="section">
+<div class="section-label">Tổng quan</div>
+<h2>Radar điểm số</h2>
+<div class="radar-wrap">
+<div class="radar-canvas-wrap"><canvas id="radar-canvas" width="600" height="600"></canvas></div>
+<div class="radar-stats" id="radar-stats"></div>
+</div>
+<div class="block-rec" id="block-rec">
+<div class="br-label">Khuyến nghị</div>
+<h3 id="br-block">—</h3>
+<p id="br-reason"></p>
+<div class="br-bottleneck" id="br-bottleneck" style="display:none"></div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-label">Chi tiết</div>
+<h2>9 kỹ năng × 5 mức</h2>
+<p>Click vào nhóm để mở rộng. Hover vào ô điểm để xem giải thích thang điểm.</p>
+<div id="groups-container"></div>
+</div>
+
+<div class="action-row">
+<button class="btn" onclick="resetAll()">Reset</button>
+<button class="btn" onclick="window.print()">In / PDF</button>
+</div>
+
+</div><!-- /panel-assess -->
+
+<!-- TAB 2: TESTDAY -->
+<div class="tab-panel" id="panel-testday">
+
+<div class="section">
+<div class="section-label">Phần 01</div>
+<h2>Sweat Rate Test Protocol</h2>
+<div class="protocol-card">
+<h4>Công thức</h4>
+<span class="pc-formula">sweat_rate (L/h) = (weight_before − weight_after + fluid_intake) / hours</span>
+<h4 style="margin-top:14px">Quy trình (60 phút)</h4>
+<ol>
+<li>Cân nặng <strong>weight_before</strong> (kg, không mặc áo, đã đi vệ sinh).</li>
+<li>Chạy 60 phút ở pace race-effort. Ghi <strong>fluid_intake</strong> (L) đã uống.</li>
+<li>Lau khô mồ hôi, cân lại <strong>weight_after</strong> (cùng điều kiện).</li>
+<li>Áp dụng công thức trên.</li>
+</ol>
+<h4 style="margin-top:14px">Đồng bộ Nutrition Plan</h4>
+<ol>
+<li>Đo sweat rate ở 3 mức nhiệt độ: &lt;20°C, 20–28°C, &gt;28°C.</li>
+<li>Hydration race: bù <strong>70–80% sweat rate</strong> (tránh hyponatremia).</li>
+<li>Sodium: 300–700 mg/L tùy "salty sweater" (vết muối trắng trên áo = chỉ báo định tính).</li>
+</ol>
+</div>
+</div>
+
+<div class="section">
+<div class="section-label">Phần 02</div>
+<h2>Aerobic Drift Test (MAF 60′)</h2>
+<div class="protocol-card">
+<h4>Công thức Drift</h4>
+<span class="pc-formula">drift % = (HR_phút_30-60 − HR_phút_0-30) / HR_phút_0-30 × 100</span>
+<h4 style="margin-top:14px">Quy trình</h4>
+<ol>
+<li>Khởi động 10–15 phút easy.</li>
+<li>Chạy 60 phút ở pace ổn định, địa hình phẳng. HR mục tiêu = MAF (180 − tuổi).</li>
+<li>Ghi HR trung bình 0–30 phút và 30–60 phút.</li>
+<li>Drift &lt;5% = AeT đã được phát triển tốt.</li>
+</ol>
+</div>
+</div>
+
+<div class="section">
+<div class="section-label">Phần 03</div>
+<h2>Test-day Evaluation Sheet</h2>
+<p>Form đánh giá nhanh — dùng để in hoặc điền tay khi VĐV không dùng app.</p>
+<div class="eval-form">
+<div class="ef-row header"><span>VĐV:</span><span class="ef-input"></span><span>Ngày:</span><span class="ef-input"></span></div>
+<div class="ef-row"><span class="ef-label">AeT (Aerobic Drift):</span><span class="ef-input">___ / 5</span><span class="ef-label">Drift đo:</span><span class="ef-input">___ %</span></div>
+<div class="ef-row"><span class="ef-label">Vertical Speed:</span><span class="ef-input">___ / 5</span><span class="ef-label">m+/h ở AeT:</span><span class="ef-input">___</span></div>
+<div class="ef-row"><span class="ef-label">Fat Oxidation:</span><span class="ef-input">___ / 5</span><span class="ef-label">Long run không bonk:</span><span class="ef-input">___ h</span></div>
+<div class="ef-row"><span class="ef-label">Sức bền & Đổ dốc:</span><span class="ef-input">___ / 5</span><span class="ef-label">Recovery dốc 1000m:</span><span class="ef-input">___ ngày</span></div>
+<div class="ef-row"><span class="ef-label">Dung nạp Carb:</span><span class="ef-input">___ / 5</span><span class="ef-label">g/h ổn định:</span><span class="ef-input">___</span></div>
+<div class="ef-row"><span class="ef-label">Điện giải & Nước:</span><span class="ef-input">___ / 5</span><span class="ef-label">Sweat rate:</span><span class="ef-input">___ L/h</span></div>
+<div class="ef-row"><span class="ef-label">Kiểm soát RPE:</span><span class="ef-input">___ / 5</span><span></span><span></span></div>
+<div class="ef-row"><span class="ef-label">Cognitive Appraisal:</span><span class="ef-input">___ / 5</span><span></span><span></span></div>
+<div class="ef-row"><span class="ef-label">Kỷ luật & Problem Solving:</span><span class="ef-input">___ / 5</span><span class="ef-label">% bài tập 8 tuần:</span><span class="ef-input">___</span></div>
+<div class="ef-summary">
+<div>→ Mức trung bình: ___________</div>
+<div>→ Bottleneck (≤2): ___________________________________</div>
+<div>→ Block khởi điểm khuyến nghị: B___</div>
+<div>→ Ghi chú: ___________________________________________</div>
+</div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-label">Phần 04</div>
+<h2>Định nghĩa chi tiết kỹ năng</h2>
+<p>Phần này giải thích đầy đủ từng kỹ năng để VĐV hiểu rõ trước khi tự chấm điểm.</p>
+<div id="skill-details"></div>
+</div>
+
+<div class="section">
+<div class="section-label">Phần 05</div>
+<h2>Hướng dẫn sử dụng</h2>
+<ol style="margin-left:1.2rem">
+<li><strong>Test-day trước, chấm điểm sau.</strong> Thực hiện các test (MAF, sweat rate, long run đánh giá) → có số liệu thực → mới chấm.</li>
+<li><strong>Trung thực với điểm số.</strong> Đánh giá quá cao = chọn block sai = chấn thương / DNF.</li>
+<li><strong>Bottleneck quyết định.</strong> Tiêu chí thấp nhất là điểm cần ưu tiên cải thiện, không phải tiêu chí mạnh nhất.</li>
+<li><strong>Đánh giá lại mỗi 4–6 tuần.</strong> Cuối mỗi block hoặc deload week. Mỗi block mục tiêu tăng ≥1 mức ở 1–2 tiêu chí ưu tiên.</li>
+<li><strong>Mức 5 (Elite)</strong> chỉ xác nhận qua kết quả thi đấu thực tế ở giải có tính cạnh tranh cao, không qua self-test.</li>
+<li><strong>Phát hiện bất thường khi test</strong> (đau bất thường, tim đập rối loạn) → dừng và tham khảo bác sĩ chuyên khoa.</li>
+</ol>
+</div>
+
+</div><!-- /panel-testday -->
+
+</div><!-- /page -->
+
+<script>
+const GROUPS=[
+{id:'phys',name:'Sinh lý',nameEn:'Physiology',radarLabel:'PHYSIO',color:'#3b9b8f',
+ skills:[
+  {id:'aet',name:'Ngưỡng Hiếu khí (AeT)',
+   desc:'Khả năng duy trì vận tốc cao nhất khi nồng độ lactate <2 mmol/L. Đo bằng Aerobic Drift trong MAF test.',
+   test:'MAF test 60′: drift = (HR_30-60′ − HR_0-30′) / HR_0-30′ × 100%',
+   levels:[
+    {n:1,lbl:'Deficient',d:'Drift >15%, thở dốc ở pace chậm, không thể nói chuyện'},
+    {n:2,lbl:'Aware',d:'Drift 10–15%, biết chạy chậm nhưng thường vượt vùng xám'},
+    {n:3,lbl:'Foundational',d:'Drift 5–10%, Z2 ổn định 1–2 giờ'},
+    {n:4,lbl:'Competitive',d:'Drift <5%, AeT pace duy trì 4–6 giờ'},
+    {n:5,lbl:'Elite',d:'Drift <3% trong 8–10 giờ, pace cao mà HR vẫn rất thấp'}]},
+  {id:'vert',name:'Tốc độ leo dốc (Vertical Speed)',
+   desc:'Số mét leo dọc (m+) mỗi giờ duy trì được ở AeT. Chỉ số then chốt cho race có D+ lớn.',
+   test:'Uphill steady 60′ ở HR AeT, ghi tổng vertical meters đạt được',
+   levels:[
+    {n:1,lbl:'Deficient',d:'<300 m+/h ở Z2'},
+    {n:2,lbl:'Aware',d:'300–500 m+/h'},
+    {n:3,lbl:'Foundational',d:'500–700 m+/h ổn định'},
+    {n:4,lbl:'Competitive',d:'700–900 m+/h, duy trì 2h+'},
+    {n:5,lbl:'Elite',d:'>900 m+/h ở AeT, kéo dài nhiều giờ'}]},
+  {id:'fat',name:'Oxy hóa chất béo (Fat Oxidation)',
+   desc:'Khả năng dùng mỡ làm năng lượng ở cường độ trung bình để tiết kiệm glycogen.',
+   test:'Long run 3h+ ở Z2 không nạp carb (chỉ nước/điện giải) — đánh giá cảm giác bonk',
+   levels:[
+    {n:1,lbl:'Deficient',d:'"Đụng tường" sớm <2h, phụ thuộc carb hoàn toàn'},
+    {n:2,lbl:'Aware',d:'Hay đói, lệ thuộc gel'},
+    {n:3,lbl:'Foundational',d:'Tiết kiệm glycogen ở Z1–Z2'},
+    {n:4,lbl:'Competitive',d:'Fat-adapted, FatMax cao ở Z2'},
+    {n:5,lbl:'Elite',d:'Race nhiều giờ ở Z2 không bonk'}]}
+]},
+{id:'physic',name:'Thể chất',nameEn:'Physical',radarLabel:'PHYSICAL',color:'#BA7517',
+ skills:[
+  {id:'musc',name:'Sức bền cơ bắp & Đổ dốc',
+   desc:'Khả năng các nhóm cơ (đùi, bắp chân) chịu hàng ngàn lần co bóp dưới tải eccentric khi đổ dốc.',
+   test:'Đổ dốc liên tục 1000m+ → đánh giá thời gian phục hồi và mức độ DOMS',
+   levels:[
+    {n:1,lbl:'Deficient',d:'Quad "cháy" sau 300–500m đổ dốc, đau nhiều ngày'},
+    {n:2,lbl:'Aware',d:'Kỹ thuật cơ bản, cơ chưa khỏe, đổ dốc chậm'},
+    {n:3,lbl:'Foundational',d:'Hoàn thành dốc 1000m+, cứng cơ cuối race nhưng không dừng'},
+    {n:4,lbl:'Competitive',d:'Đổ dốc nhanh linh hoạt, hồi phục 24–48h'},
+    {n:5,lbl:'Elite',d:'"Miễn nhiễm" eccentric, chạy 100mi không suy giảm'}]}
+]},
+{id:'nut',name:'Dinh dưỡng & Hydration',nameEn:'Nutrition',radarLabel:'NUTRITION',color:'#EF9F27',
+ skills:[
+  {id:'carb',name:'Dung nạp Carbohydrate',
+   desc:'Khả năng tiêu hóa và hấp thụ carbohydrate khi đang vận động mạnh, không gây GI issues.',
+   test:'Long run 3h, nạp tăng dần g carb/h. Theo dõi cảm giác bụng',
+   levels:[
+    {n:1,lbl:'Deficient',d:'<30 g/h (nôn, đầy bụng), bonking thường xuyên'},
+    {n:2,lbl:'Aware',d:'30–50 g/h chập chờn, đôi khi GI issues'},
+    {n:3,lbl:'Foundational',d:'45–60 g/h ổn định'},
+    {n:4,lbl:'Competitive',d:'75–90 g/h hệ thống, ổn định cả khi nóng'},
+    {n:5,lbl:'Elite',d:'100+ g/h, đa dạng lỏng/rắn trong race khắc nghiệt'}]},
+  {id:'hydra',name:'Quản lý Điện giải & Nước',
+   desc:'Khả năng nhận biết sweat rate và bù nước/sodium chính xác trong suốt race.',
+   test:'Sweat rate test (xem Tab 2). Đánh giá khả năng tự điều chỉnh trong race nóng',
+   levels:[
+    {n:1,lbl:'Deficient',d:'Không biết sweat rate, uống/nạp ngẫu nhiên'},
+    {n:2,lbl:'Aware',d:'Đoán liều, hay chuột rút khi nóng'},
+    {n:3,lbl:'Foundational',d:'Đã làm sweat rate test, có plan tổng'},
+    {n:4,lbl:'Competitive',d:'Plan riêng cho từng range nhiệt độ + cường độ'},
+    {n:5,lbl:'Elite',d:'Tự điều chỉnh real-time theo cảm giác + thời tiết'}]}
+]},
+{id:'psyc',name:'Tâm lý & Chiến thuật',nameEn:'Psychological',radarLabel:'MENTAL',color:'#4a3578',
+ skills:[
+  {id:'rpe',name:'Kiểm soát RPE',
+   desc:'Khả năng lắng nghe cơ thể để giữ cường độ phù hợp mà không cần đồng hồ. Thang RPE 0–10.',
+   test:'Chạy không nhìn đồng hồ. Sau đó đối chiếu RPE đoán vs HR/pace thực tế',
+   levels:[
+    {n:1,lbl:'Deficient',d:'Hoảng loạn khi mệt, không đọc được tín hiệu cơ thể'},
+    {n:2,lbl:'Aware',d:'Lệ thuộc đồng hồ, mông lung khi không có dữ liệu'},
+    {n:3,lbl:'Foundational',d:'Biết lắng nghe cơ thể, ước lượng RPE chính xác ±1'},
+    {n:4,lbl:'Competitive',d:'Điều tiết theo địa hình, RPE chính xác ±0.5'},
+    {n:5,lbl:'Elite',d:'"Bậc thầy cảm giác" — điều phối nỗ lực qua nhiều giờ'}]},
+  {id:'cog',name:'Cognitive Appraisal',
+   desc:'Khả năng nhìn nhận cơn đau là tín hiệu thay vì mối đe dọa. Giữ tỉnh táo dưới áp lực.',
+   test:'Đánh giá hành vi trong long run mệt nhất / race trước. DNF rate là chỉ báo',
+   levels:[
+    {n:1,lbl:'Deficient',d:'DNF khi gặp khó nhỏ (mưa, đau nhẹ)'},
+    {n:2,lbl:'Aware',d:'Biết kỹ thuật tâm lý, khó áp dụng khi đau thật'},
+    {n:3,lbl:'Foundational',d:'Dùng mantras / phân đoạn — đôi khi rơi "hố đen" lâu'},
+    {n:4,lbl:'Competitive',d:'Chấp nhận đau, giữ tỉnh táo xử lý kỹ thuật'},
+    {n:5,lbl:'Elite',d:'Tâm trí tĩnh lặng, ra quyết định logic ngay khi kiệt quệ'}]},
+  {id:'disc',name:'Kỷ luật & Problem Solving',
+   desc:'Hoàn thành kế hoạch tập luyện đều đặn + xử lý sự cố trong race (lạc, hỏng đèn, GI).',
+   test:'% bài tập đã hoàn thành 8 tuần qua + lịch sử xử lý sự cố trong race',
+   levels:[
+    {n:1,lbl:'Deficient',d:'<60% kế hoạch, hoảng khi gặp sự cố'},
+    {n:2,lbl:'Aware',d:'60–80% kế hoạch, cần hướng dẫn xử lý'},
+    {n:3,lbl:'Foundational',d:'80–90% bài tập, xử lý sự cố cơ bản'},
+    {n:4,lbl:'Competitive',d:'90–95%, bình tĩnh xử lý đa số sự cố'},
+    {n:5,lbl:'Elite',d:'≥95% nhiều tháng, xử lý mọi sự cố như reflex'}]}
+]}
+];
+
+let SCORES={};
+
+function init(){
+  document.getElementById('in-date').value=new Date().toISOString().slice(0,10);
+  buildGroups();
+  buildSkillDetails();
+  bindTabs();
+  loadFromStorage();
+  drawRadar();
+  updateStats();
+  updateBlockRec();
+}
+
+function bindTabs(){
+  document.querySelectorAll('.tab').forEach(t=>{
+    t.onclick=()=>{
+      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      document.getElementById('panel-'+t.dataset.tab).classList.add('active');
+    };
+  });
+}
+
+function hexToRgba(hex,a){const h=hex.replace('#','');const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);return `rgba(${r},${g},${b},${a})`;}
+
+function buildGroups(){
+  const c=document.getElementById('groups-container');
+  let html='';
+  GROUPS.forEach((g,gi)=>{
+    const cssVars=`--gh-color:${g.color};--gh-color-l:${hexToRgba(g.color,0.10)}`;
+    html+=`<div class="group-card${gi===0?' open':''}" data-gid="${g.id}" style="${cssVars}">
+      <div class="group-header" onclick="toggleGroup('${g.id}')">
+        <span class="gh-dot" style="background:${g.color}"></span>
+        <span class="gh-name">${g.name}<span class="gh-en">${g.nameEn}</span></span>
+        <span class="gh-avg empty" id="avg-${g.id}">—</span>
+        <span class="gh-arrow">▶</span>
+      </div>
+      <div class="group-body">`;
+    g.skills.forEach(s=>{
+      html+=`<div class="skill-row">
+        <div class="skill-head">
+          <span class="skill-name">${s.name}</span>
+          <div class="score-wrap">
+            <select class="score-select" data-gid="${g.id}" data-sid="${s.id}" onchange="onScoreChange(this)">
+              <option value="">— Chấm —</option>
+              ${[1,2,3,4,5].map(n=>`<option value="${n}">${n} — ${s.levels[n-1].lbl}</option>`).join('')}
+            </select>
+            <div class="score-popup">
+              ${s.levels.map(l=>`<div class="sp-row"><span class="sp-n">${l.n}</span><span class="sp-lbl">${l.lbl}</span><span class="sp-desc">${l.d}</span></div>`).join('')}
+            </div>
+          </div>
+        </div>
+        <div class="skill-desc">${s.desc}</div>
+      </div>`;
+    });
+    html+=`</div></div>`;
+  });
+  c.innerHTML=html;
+}
+
+function buildSkillDetails(){
+  const c=document.getElementById('skill-details');
+  let html='';
+  GROUPS.forEach(g=>{
+    html+=`<h3 style="color:${g.color}">${g.name} <span style="font-family:var(--mono);font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px;font-weight:400">${g.nameEn}</span></h3>`;
+    g.skills.forEach(s=>{
+      html+=`<div class="skill-detail">
+        <h5><span class="sd-dot" style="background:${g.color}"></span>${s.name}</h5>
+        <div class="sd-def">${s.desc}</div>
+        <div class="sd-test"><strong>Cách test:</strong> ${s.test}</div>
+      </div>`;
+    });
+  });
+  c.innerHTML=html;
+}
+
+function toggleGroup(gid){
+  document.querySelector(`.group-card[data-gid="${gid}"]`).classList.toggle('open');
+}
+
+function onScoreChange(el){
+  const gid=el.dataset.gid,sid=el.dataset.sid,v=el.value?+el.value:null;
+  if(!SCORES[gid])SCORES[gid]={};
+  if(v===null)delete SCORES[gid][sid]; else SCORES[gid][sid]=v;
+  el.classList.toggle('scored',v!==null);
+  saveToStorage();
+  drawRadar();
+  updateStats();
+  updateBlockRec();
+}
+
+function groupAvg(gid){
+  const s=SCORES[gid]||{};
+  const vals=Object.values(s);
+  if(!vals.length)return null;
+  return vals.reduce((a,b)=>a+b,0)/vals.length;
+}
+
+function overallAvg(){
+  const all=[];
+  GROUPS.forEach(g=>{const a=groupAvg(g.id);if(a!==null)all.push(a);});
+  if(!all.length)return null;
+  return all.reduce((a,b)=>a+b,0)/all.length;
+}
+
+function updateStats(){
+  const sw=document.getElementById('radar-stats');
+  let html='';
+  GROUPS.forEach(g=>{
+    const a=groupAvg(g.id);
+    const has=a!==null;
+    const cls=has?(a<2.5?'is-low':a<3.5?'is-mid':''):'';
+    const valStr=has?a.toFixed(2):'—';
+    const pct=has?(a/5*100):0;
+    html+=`<div class="radar-stat ${has?'has-score':''} ${cls}" style="${has?'border-left-color:'+g.color:''}">
+      <span class="rs-name">${g.name}</span>
+      <span class="rs-bar"><span class="rs-bar-fill" style="width:${pct}%;background:${g.color}"></span></span>
+      <span class="rs-val">${valStr}</span>
+    </div>`;
+    document.getElementById('avg-'+g.id).textContent=has?a.toFixed(2):'—';
+    document.getElementById('avg-'+g.id).classList.toggle('empty',!has);
+  });
+  sw.innerHTML=html;
+}
+
+function updateBlockRec(){
+  const ov=overallAvg();
+  const allFilled=GROUPS.every(g=>{
+    const s=SCORES[g.id]||{};
+    return Object.keys(s).length===g.skills.length;
+  });
+  const box=document.getElementById('block-rec');
+  if(ov===null||!allFilled){box.classList.remove('show');return;}
+  box.classList.add('show');
+  // Find bottleneck (lowest skill across all)
+  let bnSkill=null,bnVal=99,bnGroup=null;
+  GROUPS.forEach(g=>{
+    const s=SCORES[g.id]||{};
+    Object.entries(s).forEach(([sid,v])=>{
+      if(v<bnVal){bnVal=v;bnSkill=g.skills.find(x=>x.id===sid)?.name;bnGroup=g.name;}
+    });
+  });
+  // Map to block
+  let block,reason;
+  const physAvg=groupAvg('phys')||0;
+  if(physAvg<=1.5||(SCORES.phys&&Object.values(SCORES.phys).filter(v=>v===1).length>=2)){
+    block='B1 (Early Base) kéo dài — 4–8 tuần';
+    reason='Cần xây nền hiếu khí trước khi vào chu kỳ chuẩn. Loại bỏ Aerobic Deficiency.';
+  }else if(ov<2.5){
+    block='B1 → B2 chuẩn';
+    reason='Đi đúng chu kỳ base, không nhảy cóc. Tập trung volume + kỹ thuật cơ bản.';
+  }else if(ov<3.5){
+    block='B2 (Late Base)';
+    reason='Đã có nền, sẵn sàng tăng volume + đưa vertical (D+ 35%, Late Base).';
+  }else if(ov<4.5){
+    block='B3 (Early Specific)';
+    reason='Sẵn sàng cho race-specific work với 80/20 polarized.';
+  }else{
+    block='B3 → B4 chuẩn + Specific training';
+    reason='Tận dụng specific training: race-pace, race-terrain, B2B weekly.';
+  }
+  document.getElementById('br-block').textContent=block;
+  document.getElementById('br-reason').textContent=reason;
+  const bnBox=document.getElementById('br-bottleneck');
+  if(bnVal<=2&&bnSkill){
+    bnBox.style.display='inline-block';
+    bnBox.textContent=`⚠ Bottleneck: ${bnSkill} (mức ${bnVal}) — ưu tiên cải thiện trước.`;
+  }else bnBox.style.display='none';
+}
+
+function drawRadar(){
+  const cv=document.getElementById('radar-canvas'),ctx=cv.getContext('2d');
+  const wrap=cv.parentElement;
+  const size=wrap.clientWidth||420;
+  const dpr=window.devicePixelRatio||1;
+  cv.style.width=size+'px';cv.style.height=size+'px';
+  cv.width=size*dpr;cv.height=size*dpr;ctx.scale(dpr,dpr);
+  const cx=size/2,cy=size/2,r=size*0.28;
+  ctx.clearRect(0,0,size,size);
+  const dk=matchMedia('(prefers-color-scheme:dark)').matches;
+  const gc=dk?'rgba(255,255,255,.1)':'rgba(0,0,0,.08)';
+  const tc=dk?'#e4e2dc':'#1c1b18';
+  const tc3=dk?'#6e6d69':'#8c8b86';
+  const n=GROUPS.length;
+
+  // Colored sector backgrounds
+  for(let i=0;i<n;i++){
+    const a1=-Math.PI/2-Math.PI/n+i*(Math.PI*2/n);
+    const a2=a1+Math.PI*2/n;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,a1,a2);ctx.closePath();
+    ctx.fillStyle=hexToRgba(GROUPS[i].color,dk?0.06:0.045);
+    ctx.fill();
+  }
+
+  // Grid rings (1..5) with labels for each ring
+  for(let lvl=1;lvl<=5;lvl++){
+    ctx.beginPath();
+    for(let i=0;i<n;i++){
+      const ang=-Math.PI/2+i*(Math.PI*2/n);
+      const rr=r*lvl/5;
+      const x=cx+Math.cos(ang)*rr,y=cy+Math.sin(ang)*rr;
+      if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle=lvl===5?gc.replace(/[\d.]+\)$/,'.18)'):gc;
+    ctx.lineWidth=lvl===5?1.2:.5;
+    if(lvl<5){ctx.setLineDash([2,3]);}else{ctx.setLineDash([]);}
+    ctx.stroke();ctx.setLineDash([]);
+    // Level numbers on top axis
+    ctx.fillStyle=tc3;ctx.font='600 10px "DM Mono"';ctx.textAlign='center';ctx.textBaseline='middle';
+    const ny=cy-r*lvl/5;
+    ctx.fillStyle=dk?'#141310':'#faf9f6';
+    ctx.fillRect(cx-7,ny-7,14,14);
+    ctx.fillStyle=tc3;ctx.fillText(lvl,cx,ny);
+  }
+
+  // Axes + labels (2-line wrap support)
+  for(let i=0;i<n;i++){
+    const ang=-Math.PI/2+i*(Math.PI*2/n);
+    const x=cx+Math.cos(ang)*r,y=cy+Math.sin(ang)*r;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(x,y);ctx.strokeStyle=gc;ctx.lineWidth=.5;ctx.stroke();
+    // Endpoint dot
+    ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);
+    ctx.fillStyle=GROUPS[i].color;ctx.fill();
+
+    const labelOffset=18;
+    const lx=cx+Math.cos(ang)*(r+labelOffset),ly=cy+Math.sin(ang)*(r+labelOffset);
+    const cosA=Math.cos(ang),sinA=Math.sin(ang);
+    ctx.textAlign=Math.abs(cosA)<0.2?'center':(cosA>0?'left':'right');
+    ctx.textBaseline=Math.abs(sinA)<0.2?'middle':(sinA>0?'top':'bottom');
+    const label=(GROUPS[i].radarLabel||GROUPS[i].nameEn).toUpperCase();
+    ctx.font='700 11px "DM Sans"';
+    const tw=ctx.measureText(label).width;
+    const padX=8,padY=5;
+    const bw=tw+padX*2,bh=14+padY*2;
+    let bgX=lx-bw/2;
+    if(ctx.textAlign==='left')bgX=lx-padX;
+    else if(ctx.textAlign==='right')bgX=lx-tw-padX;
+    let bgY=ly-bh/2;
+    if(ctx.textBaseline==='top')bgY=ly-padY;
+    else if(ctx.textBaseline==='bottom')bgY=ly-bh+padY;
+    // Clamp to canvas bounds
+    bgX=Math.max(2,Math.min(size-bw-2,bgX));
+    bgY=Math.max(2,Math.min(size-bh-2,bgY));
+    ctx.fillStyle=hexToRgba(GROUPS[i].color,dk?0.20:0.14);
+    ctx.strokeStyle=hexToRgba(GROUPS[i].color,0.55);
+    ctx.lineWidth=1.2;
+    if(ctx.roundRect){ctx.beginPath();ctx.roundRect(bgX,bgY,bw,bh,bh/2);ctx.fill();ctx.stroke();}
+    else{ctx.fillRect(bgX,bgY,bw,bh);ctx.strokeRect(bgX,bgY,bw,bh);}
+    ctx.fillStyle=GROUPS[i].color;
+    ctx.font='700 11px "DM Sans"';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(label,bgX+bw/2,bgY+bh/2);
+  }
+
+  // Data polygon
+  const vals=GROUPS.map(g=>groupAvg(g.id));
+  const hasAny=vals.some(v=>v!==null);
+  if(hasAny){
+    // Gradient fill
+    const grad=ctx.createRadialGradient(cx,cy,0,cx,cy,r);
+    grad.addColorStop(0,dk?'rgba(126,212,200,.35)':'rgba(59,155,143,.30)');
+    grad.addColorStop(1,dk?'rgba(184,160,232,.18)':'rgba(74,53,120,.14)');
+    ctx.beginPath();
+    let first=true;
+    for(let i=0;i<n;i++){
+      const v=vals[i]||0;
+      const ang=-Math.PI/2+i*(Math.PI*2/n);
+      const rr=r*v/5;
+      const x=cx+Math.cos(ang)*rr,y=cy+Math.sin(ang)*rr;
+      if(first){ctx.moveTo(x,y);first=false;}else ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    ctx.fillStyle=grad;ctx.fill();
+    // Stroke with subtle glow
+    ctx.shadowColor=dk?'rgba(126,212,200,.5)':'rgba(59,155,143,.4)';
+    ctx.shadowBlur=8;
+    ctx.strokeStyle=dk?'#7ed4c8':'#1a5c54';
+    ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.stroke();
+    ctx.shadowBlur=0;
+    // Vertex points (use group color, larger)
+    for(let i=0;i<n;i++){
+      const v=vals[i];if(v===null)continue;
+      const ang=-Math.PI/2+i*(Math.PI*2/n);
+      const rr=r*v/5;
+      const x=cx+Math.cos(ang)*rr,y=cy+Math.sin(ang)*rr;
+      // Outer ring
+      ctx.beginPath();ctx.arc(x,y,7,0,Math.PI*2);
+      ctx.fillStyle=hexToRgba(GROUPS[i].color,0.25);ctx.fill();
+      // Solid dot
+      ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);
+      ctx.fillStyle=GROUPS[i].color;ctx.strokeStyle=dk?'#141310':'#fff';ctx.lineWidth=2.5;ctx.fill();ctx.stroke();
+      // Score label inside dot
+      ctx.fillStyle='#fff';ctx.font='700 9px "DM Mono"';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(v.toFixed(1),x,y+0.5);
+    }
+  }
+}
+
+function saveToStorage(){
+  try{
+    const data={scores:SCORES,name:document.getElementById('in-name').value,date:document.getElementById('in-date').value,race:document.getElementById('in-race').value};
+    localStorage.setItem('skills_assessment_v1',JSON.stringify(data));
+  }catch(e){}
+}
+
+function loadFromStorage(){
+  try{
+    const raw=localStorage.getItem('skills_assessment_v1');if(!raw)return;
+    const data=JSON.parse(raw);
+    if(data.scores)SCORES=data.scores;
+    if(data.name)document.getElementById('in-name').value=data.name;
+    if(data.date)document.getElementById('in-date').value=data.date;
+    if(data.race)document.getElementById('in-race').value=data.race;
+    // Apply scores to selects
+    GROUPS.forEach(g=>{
+      g.skills.forEach(s=>{
+        const v=SCORES[g.id]?.[s.id];
+        if(v){
+          const sel=document.querySelector(`.score-select[data-gid="${g.id}"][data-sid="${s.id}"]`);
+          if(sel){sel.value=v;sel.classList.add('scored');}
+        }
+      });
+    });
+  }catch(e){}
+}
+
+function resetAll(){
+  if(!confirm('Xóa toàn bộ điểm số đã chấm?'))return;
+  SCORES={};
+  document.querySelectorAll('.score-select').forEach(s=>{s.value='';s.classList.remove('scored');});
+  saveToStorage();drawRadar();updateStats();updateBlockRec();
+}
+
+['in-name','in-date','in-race'].forEach(id=>{
+  document.addEventListener('DOMContentLoaded',()=>{
+    document.getElementById(id)?.addEventListener('input',saveToStorage);
+  });
+});
+
+window.addEventListener('resize',drawRadar);
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
