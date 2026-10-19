@@ -36,6 +36,7 @@ Standard Astro file-routing. Notable:
 - `og-image/[slug].png.ts` — generates per-post OG images at build time using **Satori** + `@resvg/resvg-js`. Posts can override by setting `ogImage` in frontmatter; the route skips generation in that case. Tailwind classes inside the JSX-ish markup are what Satori renders, so style edits happen there, not in CSS.
 - `rss.xml.ts` — RSS feed via `@astrojs/rss`.
 - `tags/`, `series/`, `posts/`, `notes/` — dynamic listing/detail routes driven by the collections.
+- `utube.astro`, `chia.astro` — standalone mini apps (own `<html>`, no blog layout, Vietnamese UI, data in `localStorage`). `/chia` is a trip expense splitter: logic lives in `src/apps/chia/` (pure `money.ts` / `split.ts` / `vietqr.ts`, UI in `app.ts`, bill image drawn on canvas in `bill-image.ts`), bundled via the page's `<script>`.
 
 ### Markdown pipeline (`astro.config.ts` + `src/plugins/`)
 
