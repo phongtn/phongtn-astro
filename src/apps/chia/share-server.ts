@@ -321,10 +321,11 @@ export function createApi(kv: Kv | null, env: Env, now: () => number = Date.now)
 
 		/** SePay calls this for every transaction; answer {success: true} unless it should retry. */
 		sepayWebhook: async (request: Request): Promise<Response> => {
-			if (!env.SEPAY_API_KEY) return fail(503, "Chưa cấu hình SEPAY_API_KEY.");
-			if (!safeEqual(request.headers.get("authorization") ?? "", `Apikey ${env.SEPAY_API_KEY}`)) {
-				return fail(401, "Sai khoá API.");
-			}
+			const expected = env.SEPAY_API_KEY?.trim();
+			if (!expected) return fail(503, "Chưa cấu hình SEPAY_API_KEY.");
+			// "Apikey <key>"; tolerate scheme casing and stray whitespace from copy-pasted settings.
+			const sent = /^\s*apikey\s+(.+?)\s*$/i.exec(request.headers.get("authorization") ?? "")?.[1];
+			if (!sent || !safeEqual(sent, expected)) return fail(401, "Sai khoá API.");
 			return run(async (kv) => {
 				const tx = readTransaction(await readJson(request));
 				if (!tx) return fail(400, "Dữ liệu giao dịch không hợp lệ.");

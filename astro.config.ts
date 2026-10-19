@@ -114,7 +114,7 @@ export default defineConfig({
   },
   // https://docs.astro.build/en/guides/prefetch/
   prefetch: true,
-  site: "https://phongtn.com/",
+  site: "https://www.phongtn.com/",
   vite: {
     build: {
       sourcemap: true, // Source maps generation
