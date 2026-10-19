@@ -108,10 +108,10 @@ export function payState(ctx: PayContext, b: Balance): PayState {
 	};
 }
 
-/** Transfer note: the SePay payment code first when there is one, so banks never cut it off. */
+/** Transfer note: just the SePay payment code when there is one; trip and name otherwise. */
 export function memoFor(trip: Trip, member: Member, code?: string): string {
+	if (code) return code;
 	const who = toMemo(member.name, 12);
-	if (code) return `${code} ${who}`.trim();
 	return `${toMemo(trip.name, MEMO_MAX - who.length - 1)} ${who}`.trim();
 }
 
