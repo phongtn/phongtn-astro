@@ -17,7 +17,7 @@ There is no test suite.
 
 ## Architecture
 
-This is an Astro v5 personal blog built on the Astro Theme Cactus lineage (theme name "Astro Citrus"). It's a static SSG site — no server runtime.
+This is an Astro v5 personal blog built on the Astro Theme Cactus lineage (theme name "Astro Citrus"). The site itself is static SSG; the only server code is the Vercel functions in `api/` (see below).
 
 ### Content model (`src/content.config.ts`)
 
@@ -36,7 +36,15 @@ Standard Astro file-routing. Notable:
 - `og-image/[slug].png.ts` — generates per-post OG images at build time using **Satori** + `@resvg/resvg-js`. Posts can override by setting `ogImage` in frontmatter; the route skips generation in that case. Tailwind classes inside the JSX-ish markup are what Satori renders, so style edits happen there, not in CSS.
 - `rss.xml.ts` — RSS feed via `@astrojs/rss`.
 - `tags/`, `series/`, `posts/`, `notes/` — dynamic listing/detail routes driven by the collections.
-- `utube.astro`, `chia.astro` — standalone mini apps (own `<html>`, no blog layout, Vietnamese UI, data in `localStorage`). `/chia` is a trip expense splitter: logic lives in `src/apps/chia/` (pure `money.ts` / `split.ts` / `vietqr.ts`, UI in `app.ts`, bill image drawn on canvas in `bill-image.ts`), bundled via the page's `<script>`.
+- `utube.astro`, `chia.astro` — standalone mini apps (own `<html>`, no blog layout, Vietnamese UI, data in `localStorage`). `/chia` is a trip expense splitter: logic lives in `src/apps/chia/` (pure `money.ts` / `split.ts` / `vietqr.ts`, organizer UI in `app.ts`, views shared with the read-only link in `views.ts`, DOM helpers in `ui.ts`, bill/QR images drawn on canvas in `bill-image.ts`), bundled via the page's `<script>`.
+
+### Server functions (`api/`, Vercel)
+
+Vercel compiles `api/**/*.ts` into Node functions next to the static site; `api/tsconfig.json` exists because the root tsconfig's `verbatimModuleSyntax` clashes with the CommonJS output Vercel builds. These files import with relative paths (no `@/`). All logic is in `src/apps/chia/share-server.ts` behind a small `Kv` interface; `kv-upstash.ts` adapts Upstash Redis.
+
+- `POST /api/chia`, `GET|PUT|DELETE /api/chia/:id` — the group's read-only link for a trip (`/chia#/xem/<id>`). Stored in Redis with a 7-day TTL counted from creation (updates keep it). Creating it also assigns each member a payment code `CHIA` + 6 digits that goes first in the transfer note. Writes need the bearer token returned on create; the server keeps only its SHA-256. Vercel rewrites `/api/chia/<id>` to `[id].ts?id=<id>`, so read the id from the query first.
+- `POST /api/sepay/webhook` — SePay "money in" webhook (`Authorization: Apikey $SEPAY_API_KEY`). Matches the CHIA code, dedupes by SePay transaction id, adds the amount to `chia:pay:<id>`, and answers `{"success": true}`; a non-2xx makes SePay retry.
+- Env: `UPSTASH_REDIS_REST_URL`/`_TOKEN` (or `KV_REST_API_URL`/`_TOKEN` from the Vercel integration), `SEPAY_API_KEY`, `SEPAY_ACCOUNTS` (comma-separated account numbers that SePay watches; only those show "auto-confirm"). Without the Redis env the API answers 503 and the app keeps working without links.
 
 ### Markdown pipeline (`astro.config.ts` + `src/plugins/`)
 
@@ -76,4 +84,4 @@ A custom Vite plugin `rawFonts` (bottom of `astro.config.ts`) imports `.ttf` / `
 
 - Biome formatter uses **tabs** (width 2), 100-char line width, semicolons, trailing commas. `.astro` files are ignored by Biome and formatted by Prettier (`prettier-plugin-astro` + `prettier-plugin-tailwindcss`).
 - Draft posts (`draft: true`) are excluded from prod builds, RSS, OG image generation, and tag pages via `getAllPosts()`.
-- The `site` field in `astro.config.ts` is `https://phongtn.com/` (deployed via Netlify, see `netlify.toml`) — keep it in sync with the live domain.
+- The `site` field in `astro.config.ts` is `https://phongtn.com/` (deployed on Vercel; `netlify.toml` is a leftover) — keep it in sync with the live domain.

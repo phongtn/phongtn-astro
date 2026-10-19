@@ -19,6 +19,7 @@
     "@astrojs/sitemap": "^3.3.0",
     "@astrojs/tailwind": "^6.0.2",
     "@shikijs/transformers": "^1.25.1",
+    "@upstash/redis": "^1.35.3",
     "astro": "^5.7.4",
     "astro-icon": "^1.1.5",
     "astro-robots-txt": "^1.0.0",

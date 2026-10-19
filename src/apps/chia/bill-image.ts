@@ -25,6 +25,8 @@ export interface BillInput {
 	bank: BankAccount | null;
 	qrPayload: string | null;
 	memo: string;
+	/** Already received through SePay; the QR asks only for the rest. */
+	received: number;
 }
 
 interface TextOptions {
@@ -66,7 +68,7 @@ export function drawQr(
 
 /** Paints the bill and returns the height it needs; run once to measure, once to draw. */
 function paint(ctx: CanvasRenderingContext2D, input: BillInput): number {
-	const { trip, settlement, balance, bank, qrPayload, memo } = input;
+	const { trip, settlement, balance, bank, qrPayload, memo, received } = input;
 	const right = W - PAD;
 	const center = W / 2;
 	const name = balance.member.name;
@@ -131,9 +133,21 @@ function paint(ctx: CanvasRenderingContext2D, input: BillInput): number {
 			max: CW - 96,
 		});
 		y += 54;
-		text(formatVnd(balance.due), center, 96, { weight: 800, color: C.accent, align: "center" });
+		const remaining = Math.max(balance.due - received, 0);
+		text(formatVnd(remaining || balance.due), center, 96, {
+			weight: 800,
+			color: C.accent,
+			align: "center",
+		});
 		y += 132;
-		if (bank && qrPayload) {
+		if (received > 0) {
+			const status = remaining
+				? `Đã nhận ${formatVnd(received)}, còn lại số trên`
+				: "Đã nhận đủ, cảm ơn!";
+			text(status, center, 28, { weight: 700, color: C.accent, align: "center", max: CW - 96 });
+			y += 52;
+		}
+		if (bank && qrPayload && remaining > 0) {
 			drawQr(ctx, qrPayload, center - 270, y, 540);
 			y += 540 + 36;
 			text(`${bankName(bank.bin)} · ${bank.account}`, center, 32, {
@@ -278,4 +292,50 @@ export function toPngFile(canvas: HTMLCanvasElement, filename: string): Promise<
 			else reject(new Error("Không tạo được ảnh."));
 		}, "image/png");
 	});
+}
+
+export interface QrCardInput {
+	title: string;
+	/** e.g. "An chuyển cho Phong". */
+	line: string;
+	amount: number;
+	payload: string;
+	bank: BankAccount;
+	memo: string;
+}
+
+/** A small image with just the QR and transfer details, to pick from the gallery in a bank app. */
+export function renderQrCard(input: QrCardInput): HTMLCanvasElement {
+	const width = 720;
+	const pad = 48;
+	const qr = width - pad * 4;
+	const canvas = document.createElement("canvas");
+	canvas.width = width;
+	canvas.height = 380 + qr;
+	const ctx = context(canvas);
+	const center = width / 2;
+	let y = pad;
+	const text = (s: string, size: number, weight = 400, color = C.ink) => {
+		ctx.font = `${weight} ${size}px ${FONT}`;
+		ctx.fillStyle = color;
+		ctx.textAlign = "center";
+		ctx.textBaseline = "top";
+		ctx.fillText(fit(ctx, s, width - pad * 2), center, y);
+	};
+	ctx.fillStyle = "#ffffff";
+	ctx.fillRect(0, 0, width, canvas.height);
+	text(input.title, 30, 700);
+	y += 46;
+	text(input.line, 26, 400, C.muted);
+	y += 40;
+	text(formatVnd(input.amount), 64, 800, C.accent);
+	y += 88;
+	drawQr(ctx, input.payload, pad * 2, y, qr);
+	y += qr + 16;
+	text(`${bankName(input.bank.bin)} · ${input.bank.account}`, 26, 700);
+	y += 38;
+	if (input.bank.holder) text(input.bank.holder, 22, 400, C.muted);
+	y += 34;
+	text(`Nội dung: ${input.memo}`, 22, 400, C.muted);
+	return canvas;
 }

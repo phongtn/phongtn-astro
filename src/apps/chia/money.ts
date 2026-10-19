@@ -1,9 +1,9 @@
-const UNITS: Record<string, number> = { k: 1_000, tr: 1_000_000 };
+const UNITS: Record<string, number> = { k: 1_000, tr: 1_000_000, t: 1_000_000, m: 1_000_000 };
 const vnd = new Intl.NumberFormat("vi-VN");
 
 /**
  * Parses the way people type money in Vietnamese chats:
- * "350k", "1tr2", "1.5tr", "1,5 triệu", "350.000", "350000đ".
+ * "350k", "1tr2", "1t2", "1.5tr", "2m", "1,5 triệu", "350.000", "350000đ".
  * Returns a positive integer amount in VND, or null when the input is not understood.
  */
 export function parseAmount(input: string): number | null {
@@ -15,7 +15,7 @@ export function parseAmount(input: string): number | null {
 		.replace(/triệu|trieu|tr\.?$/g, "tr")
 		.replace(/nghìn|nghin|ngàn|ngan/g, "k");
 	let value: number;
-	const unit = s.match(/^(\d+(?:[.,]\d+)?)(k|tr)(\d{0,3})$/);
+	const unit = s.match(/^(\d+(?:[.,]\d+)?)(k|tr|t|m)(\d{0,3})$/);
 	if (unit) {
 		const [, num = "", suffix = "", tail = ""] = unit;
 		if (tail && /[.,]/.test(num)) return null;

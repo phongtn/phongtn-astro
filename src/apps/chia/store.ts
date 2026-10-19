@@ -1,9 +1,10 @@
-import type { BankAccount, Expense, Member, Profile, Store, Trip } from "./types";
+import type { BankAccount, Expense, Member, Profile, ShareInfo, Store, Trip } from "./types";
 
 const KEY = "chia-v1";
 
-const isObject = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null;
-const isString = (v: unknown): v is string => typeof v === "string";
+export const isObject = (v: unknown): v is Record<string, unknown> =>
+	typeof v === "object" && v !== null;
+export const isString = (v: unknown): v is string => typeof v === "string";
 const isStringArray = (v: unknown): v is string[] => Array.isArray(v) && v.every(isString);
 
 function readMember(v: unknown): Member | null {
@@ -23,7 +24,31 @@ function readExpense(v: unknown): Expense | null {
 	};
 }
 
-function readTrip(v: unknown): Trip | null {
+function readCodes(v: unknown): Record<string, string> {
+	if (!isObject(v)) return {};
+	return Object.fromEntries(Object.entries(v).filter((e): e is [string, string] => isString(e[1])));
+}
+
+function readReceived(v: unknown): Record<string, number> {
+	if (!isObject(v)) return {};
+	return Object.fromEntries(
+		Object.entries(v).filter((e): e is [string, number] => Number.isSafeInteger(e[1])),
+	);
+}
+
+function readShare(v: unknown): ShareInfo | null {
+	if (!isObject(v) || !isString(v.id) || !isString(v.token) || typeof v.expiresAt !== "number")
+		return null;
+	return {
+		id: v.id,
+		token: v.token,
+		expiresAt: v.expiresAt,
+		codes: readCodes(v.codes),
+		autoConfirm: v.autoConfirm === true,
+	};
+}
+
+export function readTrip(v: unknown): Trip | null {
 	if (!isObject(v) || !isString(v.id) || !isString(v.name) || !isString(v.organizerId)) return null;
 	if (!Array.isArray(v.members) || !Array.isArray(v.expenses)) return null;
 	const members = v.members.map(readMember).filter((m): m is Member => m !== null);
@@ -36,10 +61,12 @@ function readTrip(v: unknown): Trip | null {
 		members,
 		expenses: v.expenses.map(readExpense).filter((e): e is Expense => e !== null),
 		settled: isStringArray(v.settled) ? v.settled : [],
+		share: readShare(v.share),
+		received: readReceived(v.received),
 	};
 }
 
-function readBank(v: unknown): BankAccount | null {
+export function readBank(v: unknown): BankAccount | null {
 	return isObject(v) && isString(v.bin) && isString(v.account) && isString(v.holder)
 		? { bin: v.bin, account: v.account, holder: v.holder }
 		: null;

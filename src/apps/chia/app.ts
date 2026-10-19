@@ -1,34 +1,35 @@
 import { BANKS, bankName } from "./banks";
 import { renderBill, toPngFile } from "./bill-image";
 import { formatVnd, parseAmount } from "./money";
+import {
+	ApiError,
+	createShare,
+	deleteShare,
+	fetchShare,
+	snapshotOf,
+	updateShare,
+} from "./share-client";
+import type { SharedView } from "./share-server";
 import { type Balance, computeSettlement, participantsOf } from "./split";
 import { load, newId, save } from "./store";
 import type { BankAccount, Expense, Member, Trip } from "./types";
-import { MEMO_MAX, buildVietQr, toMemo } from "./vietqr";
-
-type Child = Node | string | null | undefined | false;
-
-function h<K extends keyof HTMLElementTagNameMap>(
-	tag: K,
-	props: Record<string, unknown> | null = null,
-	...children: (Child | Child[])[]
-): HTMLElementTagNameMap[K] {
-	const el = document.createElement(tag);
-	for (const [key, value] of Object.entries(props ?? {})) {
-		if (value === undefined || value === null || value === false) continue;
-		if (key.startsWith("on") && typeof value === "function") {
-			el.addEventListener(key.slice(2), value as EventListener);
-		} else if (key === "class") el.className = String(value);
-		else if (key in el) Reflect.set(el, key, value);
-		else el.setAttribute(key, value === true ? "" : String(value));
-	}
-	el.append(...present(children.flat()));
-	return el;
-}
-
-function present(children: Child[]): (Node | string)[] {
-	return children.filter((c): c is Node | string => Boolean(c));
-}
+import { type Child, canShareFile, copy, field, h, openDialog, present, toast } from "./ui";
+import {
+	type PayContext,
+	date,
+	expenseList,
+	memoOf,
+	nameOf,
+	payState,
+	personCard,
+	personDetailView,
+	qrPayloadOf,
+	sharedSummaryView,
+	slug,
+	splitLabel,
+	progressBox,
+} from "./views";
+import { toMemo } from "./vietqr";
 
 const root = document.getElementById("app");
 if (!root) throw new Error("#app missing");
@@ -38,72 +39,172 @@ const store = load();
 const clean = (s: string, max = 40) => s.normalize("NFC").replace(/\s+/g, " ").trim().slice(0, max);
 const same = (a: string, b: string) =>
 	clean(a).toLocaleLowerCase("vi") === clean(b).toLocaleLowerCase("vi");
-const date = (t: number) => new Date(t).toLocaleDateString("vi-VN");
-const nameOf = (trip: Trip, id: string) =>
-	(trip.members.find((m) => m.id === id) ?? trip.members.find((m) => m.id === trip.organizerId))
-		?.name ?? "";
-const slug = (s: string) => toMemo(s, 30).toLowerCase().replace(/ /g, "-") || "chia";
-
-let toastTimer = 0;
-const toastEl = h("div", { class: "toast", role: "status", "aria-live": "polite" });
-function toast(message: string) {
-	(document.querySelector("dialog[open]") ?? document.body).append(toastEl);
-	toastEl.textContent = message;
-	toastEl.classList.add("show");
-	clearTimeout(toastTimer);
-	toastTimer = window.setTimeout(() => toastEl.classList.remove("show"), 2800);
-}
+const messageOf = (error: unknown) => (error instanceof Error ? error.message : "Lỗi không rõ.");
 
 function persist() {
 	if (!save(store))
 		toast("Không lưu được. Hãy tắt chế độ ẩn danh hoặc cho phép trình duyệt lưu dữ liệu.");
+	scheduleSync();
 }
 
-async function copy(text: string) {
-	try {
-		await navigator.clipboard.writeText(text);
-		toast("Đã sao chép");
-	} catch {
-		toast("Không sao chép được trên trình duyệt này");
+// ---------- Group link (server copy) ----------
+
+interface LinkState {
+	status: "creating" | "syncing" | "ok" | "error";
+	error?: string;
+}
+
+/** Snapshot each trip's link was last updated with, to skip updates that change nothing. */
+const synced = new Map<string, string>();
+const linkStates = new Map<string, LinkState>();
+/** Latest server copy per link id: payments for the organizer, the whole page for viewers. */
+const remote = new Map<string, SharedView>();
+const remoteErrors = new Map<string, ApiError>();
+let syncTimer = 0;
+
+const linkActive = (trip: Trip) => Boolean(trip.share && trip.share.expiresAt > Date.now());
+const linkUrl = (id: string) => `${location.origin}${location.pathname}#/xem/${id}`;
+
+function isShowing(trip: Trip): boolean {
+	const r = route();
+	return (r.view === "summary" || r.view === "person") && r.trip.id === trip.id;
+}
+
+function linkStatusText(trip: Trip): string {
+	const state = linkStates.get(trip.id);
+	if (state?.status === "syncing") return "Đang cập nhật…";
+	if (state?.status === "error") return "Chưa cập nhật được, sẽ thử lại khi có mạng";
+	return "Nhóm đang thấy bản mới nhất";
+}
+
+function setLinkState(trip: Trip, state: LinkState) {
+	linkStates.set(trip.id, state);
+	const el = document.querySelector(`[data-link-status="${trip.id}"]`);
+	if (el) el.textContent = linkStatusText(trip);
+}
+
+function scheduleSync() {
+	clearTimeout(syncTimer);
+	syncTimer = window.setTimeout(() => void syncLinks(), 1000);
+}
+
+/** Pushes local changes to every live link, so the group always sees the latest numbers. */
+async function syncLinks() {
+	const bank = store.profile.bank;
+	if (!bank) return;
+	for (const trip of store.trips) {
+		const share = trip.share;
+		if (!share || !linkActive(trip)) continue;
+		const snapshot = snapshotOf(trip, bank);
+		if (synced.get(trip.id) === snapshot) continue;
+		setLinkState(trip, { status: "syncing" });
+		try {
+			const result = await updateShare(share, snapshot);
+			const codesChanged = JSON.stringify(result.codes) !== JSON.stringify(share.codes);
+			share.codes = result.codes;
+			share.autoConfirm = result.autoConfirm;
+			synced.set(trip.id, snapshot);
+			save(store);
+			setLinkState(trip, { status: "ok" });
+			if (codesChanged && isShowing(trip)) render();
+		} catch (error) {
+			if (error instanceof ApiError && error.status === 404) {
+				share.expiresAt = Math.min(share.expiresAt, Date.now());
+				save(store);
+				if (isShowing(trip)) render();
+			}
+			setLinkState(trip, { status: "error", error: messageOf(error) });
+		}
 	}
 }
 
-function field(label: string, control: HTMLElement, hint?: string) {
-	return h(
-		"div",
-		{ class: "field" },
-		h("label", { for: control.id }, label),
-		control,
-		hint ? h("p", { class: "hint" }, hint) : null,
-	);
+/** Creates the link (and the members' payment codes) the first time the summary opens. */
+async function createLink(trip: Trip) {
+	const bank = store.profile.bank;
+	if (!bank || linkStates.get(trip.id)?.status === "creating") return;
+	setLinkState(trip, { status: "creating" });
+	try {
+		const snapshot = snapshotOf(trip, bank);
+		trip.share = await createShare(snapshot);
+		synced.set(trip.id, snapshot);
+		save(store);
+		setLinkState(trip, { status: "ok" });
+	} catch (error) {
+		setLinkState(trip, { status: "error", error: messageOf(error) });
+	}
+	if (isShowing(trip)) render();
 }
 
-function openDialog(title: string, body: Child[], onClose?: () => void) {
-	const dialog = h(
-		"dialog",
-		{ class: "sheet" },
-		h(
-			"div",
-			{ class: "sheet-head" },
-			h("strong", null, title),
-			h(
-				"button",
-				{ class: "icon", type: "button", "aria-label": "Đóng", onclick: () => dialog.close() },
-				"×",
-			),
-		),
-		h("div", { class: "sheet-body" }, body),
+/** Returns true when something on screen should change. */
+async function refreshRemote(id: string): Promise<boolean> {
+	try {
+		const view = await fetchShare(id);
+		const before = JSON.stringify(remote.get(id) ?? null);
+		remote.set(id, view);
+		const hadError = remoteErrors.delete(id);
+		return hadError || before !== JSON.stringify(view);
+	} catch (error) {
+		const apiError = error instanceof ApiError ? error : new ApiError(0, messageOf(error));
+		const before = remoteErrors.get(id)?.message;
+		remoteErrors.set(id, apiError);
+		return before !== apiError.message;
+	}
+}
+
+/** Pulls SePay-matched transfers into the trip, so they survive the link's expiry. */
+async function refreshPayments(trip: Trip): Promise<boolean> {
+	const share = trip.share;
+	if (!share || !linkActive(trip)) return false;
+	const changed = await refreshRemote(share.id);
+	if (remoteErrors.get(share.id)?.status === 404) {
+		share.expiresAt = Math.min(share.expiresAt, Date.now());
+		save(store);
+		return true;
+	}
+	const payments = remote.get(share.id)?.payments ?? {};
+	let grew = false;
+	for (const [memberId, payment] of Object.entries(payments)) {
+		if (payment.amount > (trip.received[memberId] ?? 0)) {
+			trip.received[memberId] = payment.amount;
+			grew = true;
+		}
+	}
+	if (grew) save(store);
+	return changed || grew;
+}
+
+function ctxFor(trip: Trip): PayContext {
+	const share = linkActive(trip) ? trip.share : null;
+	const payments = Object.fromEntries(
+		Object.entries(trip.received).map(([id, amount]) => [id, { amount, at: "" }]),
 	);
-	dialog.addEventListener("click", (e) => {
-		if (e.target === dialog) dialog.close();
-	});
-	dialog.addEventListener("close", () => {
-		dialog.remove();
-		onClose?.();
-	});
-	document.body.append(dialog);
-	dialog.showModal();
-	return dialog;
+	return {
+		trip,
+		settlement: computeSettlement(trip),
+		bank: store.profile.bank,
+		codes: share?.codes ?? {},
+		payments: { ...payments, ...(share ? remote.get(share.id)?.payments : {}) },
+		autoConfirm: share?.autoConfirm ?? false,
+	};
+}
+
+const viewCtx = (view: SharedView): PayContext => ({
+	trip: view.trip,
+	settlement: computeSettlement(view.trip),
+	bank: view.bank,
+	codes: view.codes,
+	payments: view.payments,
+	autoConfirm: view.autoConfirm,
+});
+
+async function poll() {
+	if (document.visibilityState !== "visible") return;
+	const r = route();
+	if (r.view === "summary" || r.view === "person") {
+		if (await refreshPayments(r.trip)) render();
+	} else if (r.view === "shared" || r.view === "sharedPerson") {
+		if (await refreshRemote(r.id)) render();
+	}
 }
 
 // ---------- Routing ----------
@@ -112,14 +213,23 @@ type Route =
 	| { view: "home" }
 	| { view: "new" }
 	| { view: "trip"; trip: Trip }
-	| { view: "summary"; trip: Trip };
+	| { view: "summary"; trip: Trip }
+	| { view: "person"; trip: Trip; memberId: string }
+	| { view: "shared"; id: string }
+	| { view: "sharedPerson"; id: string; memberId: string };
 
 function route(): Route {
-	const [, section, id, sub] = location.hash.split("/");
+	const [, section = "", id = "", sub = "", memberId = ""] = location.hash.split("/");
 	if (section === "moi") return { view: "new" };
+	if (section === "xem" && id) {
+		return sub ? { view: "sharedPerson", id, memberId: sub } : { view: "shared", id };
+	}
 	const trip = store.trips.find((t) => t.id === id);
-	if (section === "t" && trip)
-		return sub === "tong-ket" ? { view: "summary", trip } : { view: "trip", trip };
+	if (section === "t" && trip) {
+		if (sub === "tong-ket") return { view: "summary", trip };
+		if (sub === "nguoi" && memberId) return { view: "person", trip, memberId };
+		return { view: "trip", trip };
+	}
 	return { view: "home" };
 }
 
@@ -128,25 +238,67 @@ function go(hash: string) {
 	else location.hash = hash;
 }
 
+function viewFor(r: Route): Child[] {
+	switch (r.view) {
+		case "home":
+			return homeView();
+		case "new":
+			return newTripView();
+		case "trip":
+			return tripView(r.trip);
+		case "summary":
+			return summaryView(r.trip);
+		case "person":
+			return personDetailView(ctxFor(r.trip), r.memberId, { back: `#/t/${r.trip.id}/tong-ket` });
+		case "shared":
+			return sharedView(r.id);
+		case "sharedPerson":
+			return sharedView(r.id, r.memberId);
+	}
+}
+
 let lastHash: string | null = null;
 function render() {
 	const r = route();
 	document.body.dataset.view = r.view;
-	const view =
-		r.view === "home"
-			? homeView()
-			: r.view === "new"
-				? newTripView()
-				: r.view === "trip"
-					? tripView(r.trip)
-					: summaryView(r.trip);
-	app.replaceChildren(...present(view));
+	app.replaceChildren(...present(viewFor(r)));
 	if (location.hash !== lastHash) {
 		lastHash = location.hash;
 		requestAnimationFrame(() =>
 			window.scrollTo(0, r.view === "trip" ? document.body.scrollHeight : 0),
 		);
+		if (r.view !== "home" && r.view !== "new" && r.view !== "trip") void poll();
 	}
+}
+
+// ---------- Read-only link ----------
+
+function sharedView(id: string, memberId?: string): Child[] {
+	const view = remote.get(id);
+	const error = remoteErrors.get(id);
+	if (!view || error?.status === 404) {
+		if (!error) return [h("p", { class: "loading" }, "Đang tải bảng chia tiền…")];
+		return [
+			h("header", { class: "intro" }, h("h1", null, "Chia tiền")),
+			h(
+				"section",
+				{ class: "card setup" },
+				h(
+					"p",
+					null,
+					error.status === 404
+						? `${error.message} Hãy xin người tổ chức gửi link mới.`
+						: error.message,
+				),
+				h("button", { class: "block", type: "button", onclick: () => void poll() }, "Thử lại"),
+			),
+			h("p", { class: "note" }, h("a", { href: "#/" }, "Tạo bảng chia tiền của bạn")),
+		];
+	}
+	const ctx = viewCtx(view);
+	return memberId
+		? personDetailView(ctx, memberId, { back: `#/xem/${id}` })
+		: sharedSummaryView(view, ctx);
 }
 
 // ---------- Home ----------
@@ -181,9 +333,10 @@ function homeView(): Child[] {
 			"ul",
 			{ class: "trips" },
 			trips.map((trip) => {
-				const s = computeSettlement(trip);
+				const ctx = ctxFor(trip);
+				const s = ctx.settlement;
 				const owing = s.balances.filter((b) => !b.isOrganizer && b.due !== 0);
-				const done = owing.filter((b) => trip.settled.includes(b.member.id)).length;
+				const done = owing.filter((b) => payState(ctx, b).done).length;
 				return h(
 					"li",
 					null,
@@ -349,6 +502,8 @@ function newTripView(): Child[] {
 			],
 			expenses: [],
 			settled: [],
+			share: null,
+			received: {},
 		};
 		store.profile.name = me;
 		store.trips.push(trip);
@@ -411,52 +566,6 @@ const freshDraft = (trip: Trip): Draft => ({
 	payerId: trip.organizerId,
 	panel: null,
 });
-
-function splitLabel(trip: Trip, ids: string[]): string {
-	if (ids.length === trip.members.length) return `chia đều ${ids.length} người`;
-	if (ids.length <= 3) return `chia ${ids.map((id) => nameOf(trip, id)).join(", ")}`;
-	return `chia ${ids.length} người`;
-}
-
-const describe = (trip: Trip, e: Expense) =>
-	`${nameOf(trip, e.payerId)} trả · ${splitLabel(trip, participantsOf(trip, e))}`;
-
-function expenseList(
-	trip: Trip,
-	onPick?: (e: Expense) => void,
-	editingId?: string | null,
-): HTMLOListElement {
-	return h(
-		"ol",
-		{ class: "expenses" },
-		trip.expenses.map((e) => {
-			const content = [
-				h(
-					"span",
-					{ class: "expense-main" },
-					h("strong", null, e.name),
-					h("span", { class: "muted small" }, describe(trip, e)),
-				),
-				h("strong", { class: "amount" }, formatVnd(e.amount)),
-			];
-			return h(
-				"li",
-				null,
-				onPick
-					? h(
-							"button",
-							{
-								type: "button",
-								class: `expense${editingId === e.id ? " editing" : ""}`,
-								onclick: () => onPick(e),
-							},
-							content,
-						)
-					: h("div", { class: "expense" }, content),
-			);
-		}),
-	);
-}
 
 function tripView(trip: Trip): Child[] {
 	let d = drafts.get(trip.id) ?? freshDraft(trip);
@@ -576,7 +685,7 @@ function tripView(trip: Trip): Child[] {
 			const amount = parseAmount(d.amount);
 			const n = d.participantIds.length;
 			preview.classList.toggle("warn", Boolean(d.amount.trim()) && amount === null);
-			if (!d.amount.trim()) preview.textContent = "Gõ nhanh: 350k · 1tr2 · 1.5tr";
+			if (!d.amount.trim()) preview.textContent = "Gõ nhanh: 350k · 1t2 · 1.5tr";
 			else if (amount === null) preview.textContent = "Chưa hiểu số tiền, thử 350k hoặc 1tr2";
 			else
 				preview.textContent = n
@@ -796,6 +905,7 @@ function tripMenu(trip: Trip) {
 				type: "button",
 				onclick: () => {
 					if (!confirm(`Xoá chuyến “${trip.name}” và toàn bộ khoản chi?`)) return;
+					if (trip.share && linkActive(trip)) void deleteShare(trip.share).catch(() => undefined);
 					store.trips = store.trips.filter((t) => t.id !== trip.id);
 					persist();
 					dialog.close();
@@ -979,56 +1089,58 @@ function bankDialog(after?: () => void) {
 	]);
 }
 
-function memoFor(trip: Trip, member: Member): string {
-	const who = toMemo(member.name, 12);
-	return `${toMemo(trip.name, MEMO_MAX - who.length - 1)} ${who}`.trim();
+function bankText(bank: BankAccount): string {
+	return `${bankName(bank.bin)} ${bank.account}${bank.holder ? ` (${bank.holder})` : ""}`;
 }
 
 function messageFor(trip: Trip, b: Balance, bank: BankAccount | null, memo: string): string {
 	const hi = `Chào ${b.member.name}! Tổng kết chuyến “${trip.name}”:`;
+	const link = trip.share && linkActive(trip) ? `\nXem chi tiết: ${linkUrl(trip.share.id)}` : "";
 	if (b.due < 0) {
-		return `${hi} bạn đã trả trước nhiều hơn phần của mình, ${nameOf(trip, trip.organizerId)} sẽ chuyển lại cho bạn ${formatVnd(b.due)}.`;
+		return `${hi} bạn đã trả trước nhiều hơn phần của mình, ${nameOf(trip, trip.organizerId)} sẽ chuyển lại cho bạn ${formatVnd(b.due)}.${link}`;
 	}
-	if (b.due === 0) return `${hi} bạn không cần chuyển thêm. Cảm ơn nhé!`;
-	const to = bank
-		? `\nChuyển khoản: ${bankName(bank.bin)} ${bank.account}${bank.holder ? ` (${bank.holder})` : ""}, nội dung “${memo}”.`
-		: "";
-	return `${hi} phần của bạn là ${formatVnd(b.due)}.${to}\nQuét mã QR trong ảnh là có sẵn số tiền. Cảm ơn nhé!`;
+	if (b.due === 0) return `${hi} bạn không cần chuyển thêm. Cảm ơn nhé!${link}`;
+	const to = bank ? `\nChuyển khoản: ${bankText(bank)}, nội dung “${memo}”.` : "";
+	return `${hi} phần của bạn là ${formatVnd(b.due)}.${to}\nQuét mã QR trong ảnh là có sẵn số tiền. Cảm ơn nhé!${link}`;
 }
 
 function groupMessage(trip: Trip): string {
-	const s = computeSettlement(trip);
-	const bank = store.profile.bank;
-	const lines = s.balances
+	const ctx = ctxFor(trip);
+	const lines = ctx.settlement.balances
 		.filter((b) => !b.isOrganizer)
 		.map(
 			(b) => `- ${b.member.name}: ${b.due < 0 ? `nhận lại ${formatVnd(b.due)}` : formatVnd(b.due)}`,
 		);
 	return [
-		`Tổng kết chuyến “${trip.name}”: tổng chi ${formatVnd(s.total)} (${trip.members.length} người).`,
+		`Tổng kết chuyến “${trip.name}”: tổng chi ${formatVnd(ctx.settlement.total)} (${trip.members.length} người).`,
 		...lines,
-		bank
-			? `Chuyển khoản: ${bankName(bank.bin)} ${bank.account}${bank.holder ? ` (${bank.holder})` : ""}`
-			: "",
+		trip.share && linkActive(trip)
+			? `Xem phần của bạn và chuyển khoản tại: ${linkUrl(trip.share.id)}`
+			: ctx.bank
+				? `Chuyển khoản: ${bankText(ctx.bank)}`
+				: "",
 	]
 		.filter(Boolean)
 		.join("\n");
 }
 
 function sendDialog(trip: Trip, memberId: string) {
-	const s = computeSettlement(trip);
-	const b = s.balances.find((x) => x.member.id === memberId);
+	const ctx = ctxFor(trip);
+	const b = ctx.settlement.balances.find((x) => x.member.id === memberId);
 	if (!b) return;
-	const bank = store.profile.bank;
-	if (b.due > 0 && !bank) return bankDialog(() => sendDialog(trip, memberId));
-	const memo = memoFor(trip, b.member);
-	const qrPayload =
-		b.due > 0 && bank
-			? buildVietQr({ bin: bank.bin, account: bank.account, amount: b.due, memo })
-			: null;
-	const canvas = renderBill({ trip, settlement: s, balance: b, bank, qrPayload, memo });
+	if (b.due > 0 && !ctx.bank) return bankDialog(() => sendDialog(trip, memberId));
+	const memo = memoOf(ctx, b);
+	const canvas = renderBill({
+		trip,
+		settlement: ctx.settlement,
+		balance: b,
+		bank: ctx.bank,
+		qrPayload: qrPayloadOf(ctx, b),
+		memo,
+		received: payState(ctx, b).received,
+	});
 	const filename = `chia-${slug(trip.name)}-${slug(b.member.name)}.png`;
-	const message = messageFor(trip, b, bank, memo);
+	const message = messageFor(trip, b, ctx.bank, memo);
 
 	let file: File | null = null;
 	const shareBtn = h(
@@ -1059,8 +1171,7 @@ function sendDialog(trip: Trip, memberId: string) {
 		.then((f) => {
 			file = f;
 			downloadBtn.disabled = false;
-			if (typeof navigator.canShare === "function" && navigator.canShare({ files: [f] }))
-				shareBtn.disabled = false;
+			if (canShareFile(f)) shareBtn.disabled = false;
 			else shareBtn.remove();
 		})
 		.catch(() => toast("Không tạo được ảnh"));
@@ -1082,15 +1193,104 @@ function sendDialog(trip: Trip, memberId: string) {
 	]);
 }
 
+async function shareLink(trip: Trip, url: string) {
+	const text = `Bảng chia tiền chuyến “${trip.name}”: mở link để xem phần của bạn và chuyển khoản.`;
+	if (typeof navigator.share === "function") {
+		try {
+			await navigator.share({ title: trip.name, text, url });
+			return;
+		} catch (err) {
+			if (err instanceof DOMException && err.name === "AbortError") return;
+		}
+	}
+	await copy(`${text}\n${url}`, "Đã sao chép link");
+}
+
+function linkBox(trip: Trip): Child {
+	if (!store.profile.bank) return null;
+	const share = trip.share;
+	const state = linkStates.get(trip.id);
+	const box = (...children: Child[]) =>
+		h("section", { class: "card setup" }, h("h2", null, "Link cho nhóm"), ...present(children));
+	if (!share) {
+		if (state?.status === "error") {
+			return box(
+				h("p", { class: "warn" }, `Chưa tạo được link: ${state.error ?? ""}`),
+				h("p", { class: "hint" }, "Nội dung chuyển khoản tạm thời chưa có mã thanh toán."),
+				h(
+					"button",
+					{ class: "block", type: "button", onclick: () => void createLink(trip) },
+					"Thử lại",
+				),
+			);
+		}
+		return box(h("p", { class: "muted" }, "Đang tạo link…"));
+	}
+	if (!linkActive(trip)) {
+		return box(
+			h("p", { class: "muted" }, `Link đã hết hạn ngày ${date(share.expiresAt)}.`),
+			h(
+				"button",
+				{
+					class: "primary block",
+					type: "button",
+					onclick: () => {
+						trip.share = null;
+						save(store);
+						void createLink(trip);
+						render();
+					},
+				},
+				"Tạo link mới (thêm 7 ngày)",
+			),
+		);
+	}
+	const url = linkUrl(share.id);
+	return box(
+		h(
+			"p",
+			{ class: "muted small" },
+			"Mọi người mở link để xem phần của mình và chuyển khoản. Chỉ xem, không sửa được.",
+		),
+		h("input", {
+			class: "link-input",
+			value: url,
+			readOnly: true,
+			"aria-label": "Link cho nhóm",
+			onfocus: (e: Event) => (e.target as HTMLInputElement).select(),
+		}),
+		h(
+			"div",
+			{ class: "composer-row" },
+			h(
+				"button",
+				{ class: "primary grow-1", type: "button", onclick: () => void shareLink(trip, url) },
+				"Gửi link",
+			),
+			h(
+				"button",
+				{ class: "grow-1", type: "button", onclick: () => void copy(url, "Đã sao chép link") },
+				"Sao chép",
+			),
+		),
+		h(
+			"p",
+			{ class: "hint" },
+			`Hết hạn ngày ${date(share.expiresAt)} · `,
+			h("span", { "data-link-status": trip.id }, linkStatusText(trip)),
+		),
+		share.autoConfirm
+			? h("p", { class: "hint accent" }, "✓ Tự ghi nhận khi chuyển khoản đúng nội dung.")
+			: null,
+	);
+}
+
 function summaryView(trip: Trip): Child[] {
-	const s = computeSettlement(trip);
+	const ctx = ctxFor(trip);
+	const s = ctx.settlement;
 	const bank = store.profile.bank;
-	const others = s.balances.filter((b) => !b.isOrganizer);
 	const me = s.balances.find((b) => b.isOrganizer);
-	const owing = others.filter((b) => b.due !== 0);
-	const done = owing.filter((b) => trip.settled.includes(b.member.id));
-	const collected = done.reduce((sum, b) => sum + Math.max(b.due, 0), 0);
-	const percent = s.toCollect ? Math.round((collected / s.toCollect) * 100) : 100;
+	if (bank && !trip.share && !linkStates.has(trip.id)) queueMicrotask(() => void createLink(trip));
 
 	const setSettled = (id: string, value: boolean) => {
 		trip.settled = value
@@ -1100,51 +1300,32 @@ function summaryView(trip: Trip): Child[] {
 		render();
 	};
 
-	const person = (b: Balance) => {
-		const settled = trip.settled.includes(b.member.id);
-		const due =
-			b.due > 0
-				? formatVnd(b.due)
-				: b.due < 0
-					? `Nhận lại ${formatVnd(b.due)}`
-					: "Không cần chuyển";
-		return h(
-			"li",
-			{ class: `card person${settled ? " done" : ""}` },
-			h(
-				"div",
-				{ class: "person-main" },
-				h("strong", null, b.member.name),
-				h(
-					"span",
-					{ class: "muted small" },
-					`Phần chịu ${formatVnd(b.share)}${b.paid ? ` · đã trả trước ${formatVnd(b.paid)}` : ""}`,
-				),
-			),
-			h("strong", { class: `due${b.due < 0 ? " warn" : ""}` }, due),
-			h(
-				"div",
-				{ class: "person-actions" },
-				b.due !== 0
+	const card = (b: Balance) => {
+		const state = payState(ctx, b);
+		const auto = b.due > 0 && state.received >= b.due;
+		return personCard(ctx, b, {
+			href: `#/t/${trip.id}/nguoi/${b.member.id}`,
+			transferIsPrimary: false,
+			extra:
+				b.due !== 0 && !auto
 					? h(
 							"label",
 							{ class: "check" },
 							h("input", {
 								type: "checkbox",
-								checked: settled,
+								checked: state.manual,
 								onchange: (e: Event) =>
 									setSettled(b.member.id, (e.target as HTMLInputElement).checked),
 							}),
 							b.due > 0 ? "Đã chuyển" : "Đã trả lại",
 						)
-					: h("span"),
-				h(
-					"button",
-					{ class: "primary small", type: "button", onclick: () => sendDialog(trip, b.member.id) },
-					"Gửi",
-				),
+					: null,
+			buttons: h(
+				"button",
+				{ class: "primary small", type: "button", onclick: () => sendDialog(trip, b.member.id) },
+				"Gửi",
 			),
-		);
+		});
 	};
 
 	return [
@@ -1169,7 +1350,7 @@ function summaryView(trip: Trip): Child[] {
 					h(
 						"p",
 						{ class: "muted" },
-						"Nhập một lần để app tạo mã QR có sẵn số tiền cho từng người.",
+						"Nhập một lần để app tạo mã QR có sẵn số tiền và link cho cả nhóm.",
 					),
 					bankForm(() => render()),
 				),
@@ -1197,20 +1378,10 @@ function summaryView(trip: Trip): Child[] {
 					)
 				: null,
 		),
-		owing.length
-			? h(
-					"div",
-					{ class: "progress-box" },
-					h(
-						"p",
-						{ class: "small" },
-						`Đã xong ${done.length}/${owing.length} người · đã thu ${formatVnd(collected)}/${formatVnd(s.toCollect)}`,
-					),
-					h("div", { class: "progress" }, h("span", { style: `width:${percent}%` })),
-				)
-			: null,
+		linkBox(trip),
+		progressBox(ctx),
 		h("h2", null, "Từng người"),
-		h("ul", { class: "people" }, others.map(person)),
+		h("ul", { class: "people" }, s.balances.filter((b) => !b.isOrganizer).map(card)),
 		me
 			? h(
 					"p",
@@ -1236,4 +1407,8 @@ function summaryView(trip: Trip): Child[] {
 }
 
 window.addEventListener("hashchange", render);
+window.addEventListener("online", scheduleSync);
+document.addEventListener("visibilitychange", () => void poll());
+setInterval(() => void poll(), 15_000);
 render();
+scheduleSync();

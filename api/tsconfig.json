@@ -1,0 +1,13 @@
+{
+	"//": "Used by Vercel when compiling these functions; the root tsconfig's verbatimModuleSyntax clashes with its CommonJS output.",
+	"compilerOptions": {
+		"target": "ES2022",
+		"module": "CommonJS",
+		"moduleResolution": "Node",
+		"lib": ["ES2022", "DOM"],
+		"strict": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true
+	},
+	"include": ["./**/*.ts", "../src/apps/chia/**/*.ts"]
+}
