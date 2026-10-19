@@ -75,4 +75,4 @@ A custom Vite plugin `rawFonts` (bottom of `astro.config.ts`) imports `.ttf` / `
 
 - Biome formatter uses **tabs** (width 2), 100-char line width, semicolons, trailing commas. `.astro` files are ignored by Biome and formatted by Prettier (`prettier-plugin-astro` + `prettier-plugin-tailwindcss`).
 - Draft posts (`draft: true`) are excluded from prod builds, RSS, OG image generation, and tag pages via `getAllPosts()`.
-- The repo's `site` field in `astro.config.ts` still points at the upstream theme's domain (`astrocitrus.artemkutsan.pp.ua`) — update before deploying under a different domain.
+- The `site` field in `astro.config.ts` is `https://phongtn.com/` (deployed via Netlify, see `netlify.toml`) — keep it in sync with the live domain.
