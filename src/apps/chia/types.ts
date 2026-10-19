@@ -24,6 +24,8 @@ export interface Trip {
 	share: ShareInfo | null;
 	/** Transfers SePay matched, per member id; copied from the link so they outlive its expiry. */
 	received: Record<string, number>;
+	/** ISO time of the latest matched transfer, per member id. */
+	receivedAt: Record<string, string>;
 }
 
 /** The group's read-only link, as known to the organizer's device. */

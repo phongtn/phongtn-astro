@@ -166,6 +166,7 @@ async function refreshPayments(trip: Trip): Promise<boolean> {
 	for (const [memberId, payment] of Object.entries(payments)) {
 		if (payment.amount > (trip.received[memberId] ?? 0)) {
 			trip.received[memberId] = payment.amount;
+			if (payment.at) trip.receivedAt[memberId] = payment.at;
 			grew = true;
 		}
 	}
@@ -176,7 +177,10 @@ async function refreshPayments(trip: Trip): Promise<boolean> {
 function ctxFor(trip: Trip): PayContext {
 	const share = linkActive(trip) ? trip.share : null;
 	const payments = Object.fromEntries(
-		Object.entries(trip.received).map(([id, amount]) => [id, { amount, at: "" }]),
+		Object.entries(trip.received).map(([id, amount]) => [
+			id,
+			{ amount, at: trip.receivedAt[id] ?? "" },
+		]),
 	);
 	return {
 		trip,
@@ -504,6 +508,7 @@ function newTripView(): Child[] {
 			settled: [],
 			share: null,
 			received: {},
+			receivedAt: {},
 		};
 		store.profile.name = me;
 		store.trips.push(trip);

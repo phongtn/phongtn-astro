@@ -34,7 +34,7 @@ const readCodes = (v: unknown): Record<string, string> =>
 
 /** The JSON body for creating or updating the shared copy; also used to detect unsynced changes. */
 export const snapshotOf = (trip: Trip, bank: BankAccount) =>
-	JSON.stringify({ trip: { ...trip, share: null, received: {} }, bank });
+	JSON.stringify({ trip: { ...trip, share: null, received: {}, receivedAt: {} }, bank });
 
 export async function createShare(snapshot: string): Promise<ShareInfo> {
 	const body = await call("/api/chia", { method: "POST", body: snapshot });

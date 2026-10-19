@@ -506,12 +506,13 @@
 	.person-actions {
 		grid-column: 1 / -1;
 		display: flex;
+		flex-wrap: wrap;
 		align-items: center;
 		justify-content: space-between;
 		gap: 12px;
 		margin-top: 6px;
 	}
-	.person.done .person-main,
+	.person.done .person-main > :not(.pill),
 	.person.done .due {
 		opacity: 0.55;
 	}
@@ -547,7 +548,6 @@
 		text-align: center;
 		color: var(--muted);
 	}
-	.person-status,
 	.person-buttons {
 		display: flex;
 		flex-wrap: wrap;
@@ -558,8 +558,9 @@
 		justify-content: flex-end;
 		margin-left: auto;
 	}
-	.person-status .pill {
-		margin-top: 0;
+	.person-main .pill {
+		justify-self: start;
+		margin-top: 6px;
 	}
 	.link-input {
 		font-size: 15px;

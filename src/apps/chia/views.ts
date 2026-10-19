@@ -17,6 +17,13 @@ export const time = (t: number) =>
 		day: "2-digit",
 		month: "2-digit",
 	});
+/** "14:32 22/10" in the viewer's local time; empty when unknown. */
+export function shortTime(iso: string): string {
+	const d = new Date(iso);
+	if (!iso || Number.isNaN(d.getTime())) return "";
+	const p = (n: number) => String(n).padStart(2, "0");
+	return `${p(d.getHours())}:${p(d.getMinutes())} ${p(d.getDate())}/${p(d.getMonth() + 1)}`;
+}
 export const nameOf = (trip: Trip, id: string) =>
 	(trip.members.find((m) => m.id === id) ?? trip.members.find((m) => m.id === trip.organizerId))
 		?.name ?? "";
@@ -146,13 +153,25 @@ export function progressBox(ctx: PayContext): Child {
 	);
 }
 
-function statusPill(ctx: PayContext, b: Balance): Child {
+/** " · 14:32 22/10" for the latest SePay transfer, or "". */
+function receivedWhen(ctx: PayContext, b: Balance): string {
+	const at = shortTime(ctx.payments[b.member.id]?.at ?? "");
+	return at ? ` · ${at}` : "";
+}
+
+/** Payment status under the name; hand-ticked states are skipped where a checkbox already shows them. */
+function statusPill(ctx: PayContext, b: Balance, showManual: boolean): Child {
 	const state = payState(ctx, b);
-	if (b.due > 0 && state.done) return h("span", { class: "pill ok" }, "✓ Đã chuyển");
+	const when = receivedWhen(ctx, b);
+	if (b.due > 0 && state.received >= b.due)
+		return h("span", { class: "pill ok" }, `✓ Đã chuyển${when}`);
+	if (b.due > 0 && state.manual)
+		return showManual ? h("span", { class: "pill ok" }, "✓ Đã chuyển") : null;
 	if (b.due > 0 && state.received > 0) {
-		return h("span", { class: "pill" }, `Đã nhận ${formatVnd(state.received)}`);
+		return h("span", { class: "pill" }, `Đã nhận ${formatVnd(state.received)}${when}`);
 	}
-	if (b.due < 0 && state.manual) return h("span", { class: "pill ok" }, "✓ Đã trả lại");
+	if (b.due < 0 && state.manual && showManual)
+		return h("span", { class: "pill ok" }, "✓ Đã trả lại");
 	return null;
 }
 
@@ -177,12 +196,13 @@ export function personCard(
 				{ class: "muted small" },
 				`Phần chịu ${formatVnd(b.share)}${b.paid ? ` · đã trả trước ${formatVnd(b.paid)}` : ""}`,
 			),
+			statusPill(ctx, b, !opts.extra),
 		),
 		h("strong", { class: `due${b.due < 0 ? " warn" : ""}` }, due),
 		h(
 			"div",
 			{ class: "person-actions" },
-			h("div", { class: "person-status" }, opts.extra ?? null, statusPill(ctx, b)),
+			opts.extra ?? null,
 			h(
 				"div",
 				{ class: "person-buttons" },
@@ -312,7 +332,7 @@ export function personDetailView(
 			{ class: "card hero" },
 			h("p", { class: "muted" }, `${name} đã chuyển cho ${organizer}`),
 			h("p", { class: "hero-amount" }, formatVnd(b.due)),
-			h("span", { class: "pill ok" }, "✓ Đã nhận đủ, cảm ơn!"),
+			h("span", { class: "pill ok" }, `✓ Đã nhận đủ${receivedWhen(ctx, b)}, cảm ơn!`),
 		);
 	} else if (b.due > 0) {
 		hero = h(
@@ -321,7 +341,11 @@ export function personDetailView(
 			h("p", { class: "muted" }, `${name} cần chuyển cho ${organizer}`),
 			h("p", { class: "hero-amount" }, formatVnd(state.remaining)),
 			state.received
-				? h("span", { class: "pill" }, `Đã nhận ${formatVnd(state.received)}, còn lại số trên`)
+				? h(
+						"span",
+						{ class: "pill" },
+						`Đã nhận ${formatVnd(state.received)}${receivedWhen(ctx, b)}, còn lại số trên`,
+					)
 				: null,
 			payload
 				? qrBlock(ctx, b, payload, state.remaining)

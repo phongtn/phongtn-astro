@@ -63,6 +63,7 @@ export function readTrip(v: unknown): Trip | null {
 		settled: isStringArray(v.settled) ? v.settled : [],
 		share: readShare(v.share),
 		received: readReceived(v.received),
+		receivedAt: readCodes(v.receivedAt),
 	};
 }
 

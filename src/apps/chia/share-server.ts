@@ -136,7 +136,7 @@ function readPayload(v: unknown): { trip: Trip; bank: BankAccount } {
 	if (trip.members.length > 50 || trip.expenses.length > 500 || texts.some((s) => s.length > 80)) {
 		throw new HttpError(400, "Chuyến đi quá lớn.");
 	}
-	return { trip: { ...trip, share: null, received: {} }, bank };
+	return { trip: { ...trip, share: null, received: {}, receivedAt: {} }, bank };
 }
 
 function autoConfirm(env: Env, bank: BankAccount): boolean {
