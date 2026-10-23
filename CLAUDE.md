@@ -36,7 +36,7 @@ Standard Astro file-routing. Notable:
 - `og-image/[slug].png.ts` — generates per-post OG images at build time using **Satori** + `@resvg/resvg-js`. Posts can override by setting `ogImage` in frontmatter; the route skips generation in that case. Tailwind classes inside the JSX-ish markup are what Satori renders, so style edits happen there, not in CSS.
 - `rss.xml.ts` — RSS feed via `@astrojs/rss`.
 - `tags/`, `series/`, `posts/`, `notes/` — dynamic listing/detail routes driven by the collections.
-- `utube.astro`, `chia.astro` — standalone mini apps (own `<html>`, no blog layout, Vietnamese UI, data in `localStorage`). `/chia` is a trip expense splitter: logic lives in `src/apps/chia/` (pure `money.ts` / `split.ts` / `vietqr.ts`, organizer UI in `app.ts`, views shared with the read-only link in `views.ts`, DOM helpers in `ui.ts`, bill/QR images drawn on canvas in `bill-image.ts`), bundled via the page's `<script>`.
+- `utube.astro`, `chia.astro`, `nang-luong.astro` — standalone mini apps (own `<html>`, no blog layout, Vietnamese UI, data in `localStorage`). `/nang-luong` is an energy-conservation simulation (braking: kinetic → heat; body: chemical → work + heat): every number comes from the pure, DOM-free model in `src/apps/nang-luong/physics.ts` (closed-form braking with drag); `scene.ts` / `sankey.ts` only draw its results. `/chia` is a trip expense splitter: logic lives in `src/apps/chia/` (pure `money.ts` / `split.ts` / `vietqr.ts`, organizer UI in `app.ts`, views shared with the read-only link in `views.ts`, DOM helpers in `ui.ts`, bill/QR images drawn on canvas in `bill-image.ts`), bundled via the page's `<script>`.
 
 ### Server functions (`api/`, Vercel)
 
