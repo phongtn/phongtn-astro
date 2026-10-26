@@ -1,0 +1,844 @@
+<!doctype html>
+<html lang="vi">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+		<title>Vì sao có bốn mùa?</title>
+		<meta
+			name="description"
+			content="Mô hình 3D tương tác: trục quay nghiêng 23,44° tạo ra bốn mùa như thế nào, kèm mặt cắt Trái Đất, chùm nắng và độ dài ngày theo vĩ độ."
+		/>
+		<meta name="theme-color" content="#edf0f6" media="(prefers-color-scheme: light)" />
+		<meta name="theme-color" content="#0a0f1e" media="(prefers-color-scheme: dark)" />
+		<link
+			rel="icon"
+			href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23070b18'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%232f6fb4'/%3E%3Cpath d='M12 6l8 20' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E"
+		/>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap"
+		/>
+	</head>
+	<body>
+		<div class="wrap">
+			<header>
+				<span class="eyebrow">Thiên văn · mô hình 3D tương tác</span>
+				<h1>Vì sao Trái Đất có bốn mùa?</h1>
+				<p class="lead">
+					Vì <strong>trục quay của Trái Đất nghiêng 23,44°</strong> và giữ nguyên hướng trong suốt năm,
+					chứ không phải vì Trái Đất lúc gần lúc xa Mặt Trời. Kéo thanh thời gian, xoay mô hình và đổi
+					vĩ độ để tự kiểm chứng.
+				</p>
+			</header>
+
+			<div class="lab">
+				<div class="stage-col">
+					<div class="stage" id="stage" aria-label="Mô hình 3D Trái Đất quay quanh Mặt Trời">
+						<div class="tags" id="tags"></div>
+						<div class="stage-top">
+							<span class="hint">Kéo để xoay · cuộn hoặc chụm hai ngón để thu phóng</span>
+							<div class="views" role="group" aria-label="Góc nhìn">
+								<button type="button" id="v-overview" data-view="overview" aria-pressed="true"
+									>Toàn cảnh</button
+								>
+								<button type="button" id="v-side" data-view="side" aria-pressed="false"
+									>Ngang quỹ đạo</button
+								>
+								<button type="button" id="v-follow" data-view="follow" aria-pressed="false"
+									>Theo Trái Đất</button
+								>
+							</div>
+						</div>
+					</div>
+
+					<div class="timebar">
+						<div class="timerow">
+							<button type="button" class="play" id="play" aria-pressed="false">
+								<svg viewBox="0 0 16 16" aria-hidden="true"
+									><path id="play-icon" d="M4 2.5v11l9-5.5z"></path></svg
+								>
+								<span id="play-label">Chạy</span>
+							</button>
+							<div class="slider-wrap">
+								<input
+									type="range"
+									id="day"
+									min="0"
+									max="364.9"
+									step="0.1"
+									value="0"
+									aria-label="Ngày trong năm"
+								/>
+								<div class="months" id="months" aria-hidden="true"></div>
+							</div>
+						</div>
+						<div class="chips">
+							<button type="button" class="chip" id="m-today" data-day="today">Hôm nay</button>
+							<button type="button" class="chip" id="m-spring" data-day="78.6">Xuân phân</button>
+							<button type="button" class="chip" id="m-summer" data-day="171.4">Hạ chí</button>
+							<button type="button" class="chip" id="m-autumn" data-day="265.3">Thu phân</button>
+							<button type="button" class="chip" id="m-winter" data-day="354.8">Đông chí</button>
+							<button type="button" class="chip" id="m-peri" data-day="2.5">Cận nhật</button>
+							<button type="button" class="chip" id="m-aph" data-day="184.4">Viễn nhật</button>
+							<span class="sep"></span>
+							<div class="seg" role="group" aria-label="Tốc độ">
+								<button type="button" id="s1" data-speed="6" aria-pressed="false">Chậm</button>
+								<button type="button" id="s2" data-speed="20" aria-pressed="true">Vừa</button>
+								<button type="button" id="s3" data-speed="60" aria-pressed="false">Nhanh</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<aside class="panel" aria-live="off">
+					<section>
+						<span class="eyebrow">Ngày đang xem</span>
+						<div class="date" id="o-date">—</div>
+						<div class="event" id="o-event"></div>
+						<div class="seasons">
+							<div class="season">
+								<span class="eyebrow">Bắc bán cầu</span><strong id="o-north">—</strong>
+							</div>
+							<div class="season">
+								<span class="eyebrow">Nam bán cầu</span><strong id="o-south">—</strong>
+							</div>
+						</div>
+						<dl class="kv">
+							<dt>Mặt Trời đứng bóng ở vĩ độ</dt><dd id="o-dec">—</dd>
+							<dt>Khoảng cách tới Mặt Trời</dt><dd id="o-dist">—</dd>
+						</dl>
+					</section>
+					<section>
+						<div class="label-row">
+							<label for="lat">Nơi quan sát</label>
+							<span class="num small" id="o-lat">—</span>
+						</div>
+						<div class="chips" id="cities"></div>
+						<input
+							type="range"
+							id="lat"
+							min="-90"
+							max="90"
+							step="0.1"
+							value="21.03"
+							aria-label="Vĩ độ nơi quan sát"
+						/>
+						<div class="big3">
+							<div>
+								<span class="eyebrow">Độ dài ngày</span><span class="num" id="o-len">—</span>
+							</div>
+							<div><span class="eyebrow">Nắng trưa</span><span class="num" id="o-alt">—</span></div>
+							<div><span class="eyebrow">Năng lượng</span><span class="num" id="o-q">—</span></div>
+						</div>
+						<p class="note">
+							Năng lượng: công suất nắng trung bình cả ngày trên mỗi mét vuông mặt đất nằm ngang, đo
+							ở đỉnh khí quyển.
+						</p>
+					</section>
+					<section>
+						<div class="label-row">
+							<label for="tilt">Góc nghiêng trục quay</label>
+							<span class="num small" id="o-tilt">23,44°</span>
+						</div>
+						<input type="range" id="tilt" min="0" max="45" step="0.01" value="23.44" />
+						<div class="label-row">
+							<span class="note">Kéo về 0° để xem mùa biến mất.</span>
+							<button type="button" class="linkbtn" id="tilt-reset">Về 23,44°</button>
+						</div>
+					</section>
+				</aside>
+			</div>
+
+			<div class="figs">
+				<figure>
+					<span class="eyebrow">Mặt cắt Trái Đất</span>
+					<canvas id="cv-section" aria-label="Mặt cắt Trái Đất với trục nghiêng và vòng vĩ độ"
+					></canvas>
+					<figcaption id="c-section">—</figcaption>
+				</figure>
+				<figure>
+					<span class="eyebrow">Cùng một chùm nắng lúc giữa trưa</span>
+					<canvas id="cv-beam" aria-label="Chùm nắng chiếu xiên trải trên mặt đất"></canvas>
+					<figcaption id="c-beam">—</figcaption>
+				</figure>
+				<figure class="chart">
+					<span class="eyebrow">Độ dài ngày quanh năm (giờ) · bấm để chọn ngày</span>
+					<canvas id="cv-chart" aria-label="Biểu đồ độ dài ngày theo tháng"></canvas>
+					<figcaption id="c-chart">—</figcaption>
+				</figure>
+			</div>
+
+			<section class="explain" aria-label="Giải thích">
+				<article>
+					<span class="step">Hiểu lầm phổ biến</span>
+					<h3>Khoảng cách gần như không liên quan</h3>
+					<p>
+						Trái Đất gần Mặt Trời nhất vào khoảng <span class="num">3/1</span> (<span class="num"
+							>147,1</span
+						> triệu km) và xa nhất vào khoảng <span class="num">4/7</span> (<span class="num"
+							>152,1</span
+						> triệu km). Đầu tháng Một lại là giữa mùa đông ở Bắc bán cầu. Khoảng cách chỉ chênh <span
+							class="num">3,3%</span
+						>, làm năng lượng nhận được chênh khoảng <span class="num">7%</span>. Hai bán cầu luôn
+						có mùa ngược nhau, điều mà khoảng cách không thể giải thích.
+					</p>
+				</article>
+				<article>
+					<span class="step">Nguyên nhân</span>
+					<h3>Trục nghiêng giữ nguyên hướng</h3>
+					<p>
+						Trục quay nghiêng <span class="num">23,44°</span> so với phương vuông góc với mặt phẳng quỹ
+						đạo và luôn chỉ về gần sao Bắc Cực. Vì vậy trong nửa năm, Bắc bán cầu ngả về phía Mặt Trời;
+						nửa năm còn lại nó ngả ra xa. Bốn quả cầu mờ trên quỹ đạo cho thấy trục của chúng luôn song
+						song với nhau.
+					</p>
+				</article>
+				<article>
+					<span class="step">Hệ quả</span>
+					<h3>Nắng gắt hơn và ngày dài hơn</h3>
+					<p>
+						Khi bán cầu ngả về phía Mặt Trời, nắng chiếu gần thẳng đứng hơn: cùng một chùm tia dồn
+						vào diện tích nhỏ hơn, nên mỗi mét vuông nhận nhiều năng lượng hơn. Đồng thời ngày dài
+						hơn đêm, mặt đất có nhiều giờ hấp thụ nhiệt hơn giờ tỏa nhiệt. Hai hiệu ứng cộng lại tạo
+						nên mùa hè.
+					</p>
+				</article>
+			</section>
+
+			<section class="try" aria-label="Thử nghiệm">
+				<h2>Thử ba thí nghiệm</h2>
+				<div class="try-list">
+					<button type="button" id="t-notilt"
+						><strong>Dựng thẳng trục quay</strong><span
+							>Đặt góc nghiêng về 0°. Ở mọi nơi, ngày luôn dài 12 giờ và độ cao nắng trưa không đổi
+							suốt năm.</span
+						></button
+					>
+					<button type="button" id="t-polar"
+						><strong>Đêm địa cực ở Tromsø</strong><span
+							>Tháng 12, thành phố phía trên vòng Bắc Cực này không thấy Mặt Trời mọc trong nhiều
+							tuần.</span
+						></button
+					>
+					<button type="button" id="t-sydney"
+						><strong>Mùa ngược ở Sydney</strong><span
+							>Cùng ngày Hạ chí, Sydney ở Nam bán cầu đang giữa mùa đông, ngày ngắn và nắng xiên.</span
+						></button
+					>
+				</div>
+			</section>
+
+			<section class="try" aria-label="Bốn mốc trong năm">
+				<h2>Bốn mốc trong năm tại <span id="tbl-city">Hà Nội</span></h2>
+				<div class="table-wrap">
+					<table>
+						<thead
+							><tr
+								><th>Mốc</th><th>Ngày (2026)</th><th>Mặt Trời đứng bóng ở</th><th>Độ dài ngày</th
+								><th>Nắng trưa cao</th></tr
+							></thead
+						>
+						<tbody id="tbl"></tbody>
+					</table>
+				</div>
+			</section>
+
+			<section class="vn">
+				<h2>Còn ở Việt Nam?</h2>
+				<p>
+					Hà Nội nằm ngay dưới chí tuyến Bắc, nên chênh lệch độ dài ngày giữa Hạ chí và Đông chí lên
+					tới khoảng 2,5 giờ; cộng thêm gió mùa đông bắc, miền Bắc có mùa đông lạnh rõ rệt. TP. Hồ
+					Chí Minh gần xích đạo hơn: độ dài ngày chỉ dao động khoảng hơn 1 giờ, nắng trưa luôn cao,
+					nên mùa ở đây được quyết định chủ yếu bởi lượng mưa (mùa mưa và mùa khô) hơn là nhiệt độ.
+				</p>
+			</section>
+
+			<footer>
+				Mô hình đã đơn giản hóa: kích thước Trái Đất, Mặt Trời và khoảng cách giữa chúng không theo
+				tỉ lệ, còn độ dẹt quỹ đạo thì theo tỉ lệ thật (gần như tròn). Tốc độ tự quay của Trái Đất
+				chỉ để minh họa. Độ dài ngày tính theo tâm Mặt Trời, bỏ qua khúc xạ khí quyển, nên thực tế
+				ngày dài hơn vài phút. Năng lượng dùng hằng số Mặt Trời <span class="num">1361 W/m²</span>.
+			</footer>
+		</div>
+		<script>
+			import "@/apps/bon-mua/app";
+		</script>
+	</body>
+</html>
+
+<style is:global>
+	/* Bố cục: phòng thí nghiệm thiên văn — sân khấu 3D + bảng số đo, bên dưới là ba sơ đồ phụ và phần giải thích */
+	:root {
+		--bg: #edf0f6;
+		--surface: #ffffff;
+		--ink: #131c33;
+		--muted: #5a6580;
+		--line: #d6dce8;
+		--sun: #c8730a;
+		--sun-soft: rgba(200, 115, 10, 0.14);
+		--cool: #2f62c9;
+		--day-fill: #fbe7c4;
+		--night-fill: #1f2b48;
+		--space: #070b18;
+		--space-fg: #dce3f5;
+		--font-display: "Newsreader", "Iowan Old Style", Georgia, serif;
+		--font-body: "Be Vietnam Pro", "Segoe UI", system-ui, sans-serif;
+		--font-data: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+	}
+	@media (prefers-color-scheme: dark) {
+		:root {
+			--bg: #0a0f1e;
+			--surface: #121a2e;
+			--ink: #e5e9f4;
+			--muted: #95a2bf;
+			--line: #26324d;
+			--sun: #f2a63a;
+			--sun-soft: rgba(242, 166, 58, 0.15);
+			--cool: #84a9ff;
+			--day-fill: #4a3a1c;
+			--night-fill: #0b1226;
+			color-scheme: dark;
+		}
+	}
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+	[hidden] {
+		display: none !important;
+	}
+	body {
+		margin: 0;
+		background: var(--bg);
+		color: var(--ink);
+		font-family: var(--font-body);
+		font-size: 15px;
+		line-height: 1.6;
+	}
+	.wrap {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding-left: max(16px, env(safe-area-inset-left, 0px));
+		padding-right: max(16px, env(safe-area-inset-right, 0px));
+		padding-block: 28px 56px;
+		display: grid;
+		gap: 28px;
+	}
+	h1,
+	h2,
+	h3 {
+		font-family: var(--font-display);
+		font-weight: 600;
+		text-wrap: balance;
+		margin: 0;
+		line-height: 1.15;
+	}
+	h1 {
+		font-size: clamp(30px, 4.6vw, 48px);
+		letter-spacing: -0.01em;
+	}
+	h2 {
+		font-size: 26px;
+	}
+	h3 {
+		font-size: 19px;
+	}
+	p {
+		margin: 0;
+	}
+	.eyebrow {
+		font-family: var(--font-data);
+		font-size: 11.5px;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--muted);
+	}
+	.num {
+		font-family: var(--font-data);
+		font-variant-numeric: tabular-nums;
+	}
+
+	header {
+		display: grid;
+		gap: 10px;
+		max-width: 760px;
+	}
+	.lead {
+		font-size: 17px;
+		color: var(--muted);
+		max-width: 65ch;
+	}
+	.lead strong {
+		color: var(--ink);
+		font-weight: 600;
+	}
+
+	/* phòng thí nghiệm */
+	.lab {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) 330px;
+		gap: 20px;
+		align-items: start;
+	}
+	@media (max-width: 920px) {
+		.lab {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+
+	.stage-col {
+		display: grid;
+		gap: 12px;
+		min-width: 0;
+	}
+	.stage {
+		position: relative;
+		height: clamp(360px, 58vh, 600px);
+		border-radius: 14px;
+		overflow: hidden;
+		background: var(--space);
+		color: var(--space-fg);
+		touch-action: none;
+	}
+	.stage canvas {
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+	.tags {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		overflow: hidden;
+	}
+	.tag {
+		position: absolute;
+		left: 0;
+		top: 0;
+		white-space: nowrap;
+		font-family: var(--font-data);
+		font-size: 11px;
+		line-height: 1.3;
+		color: var(--space-fg);
+		opacity: 0.85;
+		text-align: center;
+		text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+	}
+	.tag b {
+		display: block;
+		font-family: var(--font-body);
+		font-weight: 600;
+		font-size: 12px;
+		opacity: 1;
+	}
+	.tag.sun b {
+		color: #ffd27a;
+	}
+	.tag.earth b {
+		color: #9cc2ff;
+	}
+	.stage-top {
+		position: absolute;
+		top: 10px;
+		left: 10px;
+		right: 10px;
+		display: flex;
+		justify-content: space-between;
+		gap: 8px;
+		flex-wrap: wrap;
+		pointer-events: none;
+	}
+	.stage-top > * {
+		pointer-events: auto;
+	}
+	.hint {
+		font-size: 12px;
+		color: rgba(220, 227, 245, 0.7);
+		padding: 6px 2px;
+	}
+	.views {
+		display: flex;
+		gap: 2px;
+		background: rgba(255, 255, 255, 0.08);
+		border-radius: 9px;
+		padding: 3px;
+	}
+	.views button {
+		font: 500 12.5px var(--font-body);
+		color: var(--space-fg);
+		background: transparent;
+		border: 0;
+		padding: 6px 10px;
+		border-radius: 7px;
+		cursor: pointer;
+	}
+	.views button[aria-pressed="true"] {
+		background: rgba(255, 255, 255, 0.18);
+	}
+	.views button:focus-visible {
+		outline: 2px solid #ffd27a;
+		outline-offset: 1px;
+	}
+
+	.timebar {
+		background: var(--surface);
+		border: 1px solid var(--line);
+		border-radius: 12px;
+		padding: 14px 16px;
+		display: grid;
+		gap: 10px;
+	}
+	.timerow {
+		display: flex;
+		align-items: center;
+		gap: 14px;
+	}
+	.play {
+		flex: none;
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		font: 600 14px var(--font-body);
+		background: var(--ink);
+		color: var(--bg);
+		border: 0;
+		border-radius: 999px;
+		padding: 9px 16px 9px 13px;
+		cursor: pointer;
+	}
+	.play svg {
+		width: 14px;
+		height: 14px;
+		fill: currentColor;
+	}
+	.play:focus-visible,
+	.chip:focus-visible,
+	.seg button:focus-visible,
+	.try button:focus-visible,
+	.linkbtn:focus-visible {
+		outline: 2px solid var(--sun);
+		outline-offset: 2px;
+	}
+	.slider-wrap {
+		flex: 1;
+		min-width: 0;
+		display: grid;
+		gap: 2px;
+	}
+	input[type="range"] {
+		width: 100%;
+		accent-color: var(--sun);
+		margin: 0;
+	}
+	.months {
+		position: relative;
+		height: 16px;
+		font-family: var(--font-data);
+		font-size: 10.5px;
+		color: var(--muted);
+	}
+	.months span {
+		position: absolute;
+		transform: translateX(-50%);
+	}
+	.chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		align-items: center;
+	}
+	.chip {
+		font: 500 12.5px var(--font-body);
+		color: var(--ink);
+		background: transparent;
+		border: 1px solid var(--line);
+		border-radius: 999px;
+		padding: 4px 11px;
+		cursor: pointer;
+	}
+	.chip:hover {
+		border-color: var(--muted);
+	}
+	.chip[aria-pressed="true"] {
+		background: var(--sun-soft);
+		border-color: var(--sun);
+	}
+	.chips .sep {
+		flex: 1;
+	}
+	.seg {
+		display: inline-flex;
+		border: 1px solid var(--line);
+		border-radius: 999px;
+		overflow: hidden;
+	}
+	.seg button {
+		font: 500 12px var(--font-body);
+		background: transparent;
+		color: var(--muted);
+		border: 0;
+		padding: 4px 10px;
+		cursor: pointer;
+	}
+	.seg button[aria-pressed="true"] {
+		background: var(--ink);
+		color: var(--bg);
+	}
+
+	/* bảng số đo */
+	.panel {
+		background: var(--surface);
+		border: 1px solid var(--line);
+		border-radius: 14px;
+		display: grid;
+		min-width: 0;
+	}
+	.panel section {
+		padding: 16px 18px;
+		display: grid;
+		gap: 10px;
+	}
+	.panel section + section {
+		border-top: 1px solid var(--line);
+	}
+	.date {
+		font-family: var(--font-display);
+		font-size: 30px;
+		font-weight: 600;
+		line-height: 1.1;
+	}
+	.event {
+		font-size: 13px;
+		color: var(--sun);
+		font-weight: 600;
+		min-height: 1.4em;
+	}
+	.kv {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: 6px 12px;
+		font-size: 13.5px;
+	}
+	.kv dt {
+		color: var(--muted);
+	}
+	.kv dd {
+		margin: 0;
+		text-align: right;
+		font-family: var(--font-data);
+		font-variant-numeric: tabular-nums;
+		font-size: 13px;
+	}
+	.seasons {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 8px;
+	}
+	.season {
+		border-radius: 10px;
+		padding: 8px 10px;
+		background: var(--bg);
+	}
+	.season .eyebrow {
+		font-size: 10px;
+	}
+	.season strong {
+		display: block;
+		font-family: var(--font-display);
+		font-size: 21px;
+		font-weight: 600;
+	}
+	.label-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		gap: 10px;
+	}
+	.label-row label {
+		font-weight: 600;
+		font-size: 14px;
+	}
+	.linkbtn {
+		font: 500 12px var(--font-body);
+		color: var(--cool);
+		background: none;
+		border: 0;
+		padding: 0;
+		cursor: pointer;
+		text-decoration: underline;
+		text-underline-offset: 2px;
+	}
+	.small {
+		font-size: 13px;
+	}
+	.note {
+		font-size: 12.5px;
+		color: var(--muted);
+	}
+	.big3 {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 8px;
+	}
+	.big3 div {
+		display: grid;
+		gap: 2px;
+	}
+	.big3 .eyebrow {
+		font-size: 9.5px;
+		letter-spacing: 0.08em;
+	}
+	.big3 .num {
+		font-size: 16px;
+		font-weight: 500;
+	}
+
+	/* sơ đồ phụ */
+	.figs {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+		gap: 16px;
+	}
+	figure {
+		margin: 0;
+		background: var(--surface);
+		border: 1px solid var(--line);
+		border-radius: 14px;
+		padding: 16px;
+		display: grid;
+		gap: 10px;
+		align-content: start;
+		min-width: 0;
+	}
+	figure canvas {
+		width: 100%;
+		height: 210px;
+		display: block;
+	}
+	figure.chart canvas {
+		cursor: crosshair;
+		touch-action: none;
+	}
+	figcaption {
+		font-size: 13.5px;
+		color: var(--muted);
+	}
+	figcaption strong {
+		color: var(--ink);
+		font-weight: 600;
+	}
+
+	/* giải thích */
+	.explain {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		gap: 28px 32px;
+	}
+	.explain article {
+		display: grid;
+		gap: 8px;
+		align-content: start;
+	}
+	.explain p {
+		color: var(--ink);
+		max-width: 62ch;
+	}
+	.explain .step {
+		font-family: var(--font-data);
+		font-size: 12px;
+		color: var(--sun);
+	}
+
+	.try {
+		display: grid;
+		gap: 12px;
+	}
+	.try-list {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+		gap: 12px;
+	}
+	.try button {
+		text-align: left;
+		display: grid;
+		gap: 4px;
+		font: inherit;
+		color: var(--ink);
+		background: var(--surface);
+		border: 1px solid var(--line);
+		border-radius: 12px;
+		padding: 14px 16px;
+		cursor: pointer;
+	}
+	.try button:hover {
+		border-color: var(--sun);
+	}
+	.try button strong {
+		font-weight: 600;
+	}
+	.try button span {
+		font-size: 13.5px;
+		color: var(--muted);
+	}
+
+	.table-wrap {
+		overflow-x: auto;
+		background: var(--surface);
+		border: 1px solid var(--line);
+		border-radius: 14px;
+	}
+	table {
+		border-collapse: collapse;
+		width: 100%;
+		min-width: 560px;
+		font-size: 14px;
+	}
+	th,
+	td {
+		padding: 10px 16px;
+		text-align: left;
+		border-bottom: 1px solid var(--line);
+	}
+	th {
+		font-family: var(--font-data);
+		font-weight: 500;
+		font-size: 11px;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--muted);
+	}
+	tr:last-child td {
+		border-bottom: 0;
+	}
+	td.num {
+		font-size: 13px;
+	}
+	.vn {
+		display: grid;
+		gap: 8px;
+		max-width: 760px;
+	}
+	footer {
+		font-size: 12.5px;
+		color: var(--muted);
+		max-width: 80ch;
+		border-top: 1px solid var(--line);
+		padding-top: 16px;
+	}
+
+	@media (max-width: 520px) {
+		.months span:nth-child(even) {
+			display: none;
+		}
+		.timerow {
+			flex-wrap: wrap;
+		}
+		.date {
+			font-size: 26px;
+		}
+	}
+</style>

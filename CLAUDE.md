@@ -36,6 +36,7 @@ Standard Astro file-routing. Notable:
 - `og-image/[slug].png.ts` — generates per-post OG images at build time using **Satori** + `@resvg/resvg-js`. Posts can override by setting `ogImage` in frontmatter; the route skips generation in that case. Tailwind classes inside the JSX-ish markup are what Satori renders, so style edits happen there, not in CSS.
 - `rss.xml.ts` — RSS feed via `@astrojs/rss`.
 - `tags/`, `series/`, `posts/`, `notes/` — dynamic listing/detail routes driven by the collections.
+- `bon-mua.astro` — standalone interactive 3D explainer of why Earth has seasons (Vietnamese). Pure astronomy model + formatting in `src/apps/bon-mua/model.ts`, Three.js scene in `scene.ts` (only page that bundles `three`), 2D canvas diagrams in `figures.ts`, DOM wiring in `app.ts`.
 - `utube.astro`, `chia.astro` — standalone mini apps (own `<html>`, no blog layout, Vietnamese UI, data in `localStorage`). `/chia` is a trip expense splitter: logic lives in `src/apps/chia/` (pure `money.ts` / `split.ts` / `vietqr.ts`, organizer UI in `app.ts`, views shared with the read-only link in `views.ts`, DOM helpers in `ui.ts`, bill/QR images drawn on canvas in `bill-image.ts`), bundled via the page's `<script>`.
 
 ### Server functions (`api/`, Vercel)
